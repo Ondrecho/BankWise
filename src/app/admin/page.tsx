@@ -99,6 +99,12 @@ export default function AdminDashboard() {
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [editedRoleName, setEditedRoleName] = useState('');
 
+  // Logs Management
+  const [logDate, setLogDate] = useState('');
+  const [taskId, setTaskId] = useState('');
+  const [logStatus, setLogStatus] = useState('');
+  const [downloadLink, setDownloadLink] = useState('');
+
   useEffect(() => {
     // Mock API call to fetch users
     const fetchUsers = async () => {
@@ -299,6 +305,69 @@ export default function AdminDashboard() {
     });
   };
 
+  // Logs Management Handlers
+  const handleGenerateLogs = async () => {
+    // Mock API call to generate logs
+    const mockedTaskId = '550e8400-e29b-41d4-a716-446655440000';
+    setTaskId(mockedTaskId);
+    setLogStatus('PENDING');
+
+    toast({
+      title: 'Log generation started!',
+      description: `Task ID: ${mockedTaskId}. Check status to download.`,
+    });
+
+    // Simulate asynchronous log generation status check
+    setTimeout(async () => {
+      // Mock API call to check log generation status
+      const mockedStatus = 'COMPLETED';
+      const mockedProgress = 100;
+
+      setLogStatus(mockedStatus);
+
+      if (mockedStatus === 'COMPLETED') {
+        // Mock API call to get the log file
+        const mockedDownloadLink = '/api/logs/download/' + mockedTaskId;
+        setDownloadLink(mockedDownloadLink);
+
+        toast({
+          title: 'Log generation completed!',
+          description: `Logs for ${logDate} are ready to download.`,
+        });
+      } else {
+        toast({
+          title: 'Log generation failed!',
+          description: `Failed to generate logs for ${logDate}.`,
+          variant: "destructive",
+        });
+      }
+    }, 5000); // Simulate 5 seconds of log generation
+  };
+
+  const handleCheckStatus = async () => {
+    // Mock API call to check log generation status
+    const mockedStatus = 'COMPLETED';
+    const mockedProgress = 100;
+
+    setLogStatus(mockedStatus);
+
+    if (mockedStatus === 'COMPLETED') {
+      // Mock API call to get the log file
+      const mockedDownloadLink = '/api/logs/download/' + taskId;
+      setDownloadLink(mockedDownloadLink);
+
+      toast({
+        title: 'Log generation completed!',
+        description: `Logs for ${logDate} are ready to download.`,
+      });
+    } else {
+      toast({
+        title: 'Log generation pending!',
+        description: `Log generation is still pending for ${logDate}.`,
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
@@ -307,6 +376,7 @@ export default function AdminDashboard() {
         <TabsList>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="roles">Role Management</TabsTrigger>
+          <TabsTrigger value="logs">Logs Management</TabsTrigger>
         </TabsList>
         <TabsContent value="users">
           <Card className="w-full">
@@ -606,6 +676,50 @@ export default function AdminDashboard() {
                   <Button onClick={handleUpdateRole} className="mt-2">
                     Update Role
                   </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="logs">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Logs Management</CardTitle>
+              <CardDescription>Generate and download logs for specific dates.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="logDate">Log Date</Label>
+                  <Input
+                    type="date"
+                    id="logDate"
+                    name="logDate"
+                    value={logDate}
+                    onChange={(e) => setLogDate(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button onClick={handleGenerateLogs}>Generate Logs</Button>
+
+              {taskId && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-2">Log Generation Status</h3>
+                  <p>Task ID: {taskId}</p>
+                  <p>Status: {logStatus || 'Pending...'}</p>
+
+                  {logStatus !== 'COMPLETED' && (
+                    <Button variant="secondary" onClick={handleCheckStatus}>
+                      Check Status
+                    </Button>
+                  )}
+
+                  {downloadLink && (
+                    <a href={downloadLink} download className="block mt-2">
+                      <Button>Download Logs</Button>
+                    </a>
+                  )}
                 </div>
               )}
             </CardContent>
