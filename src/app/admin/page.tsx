@@ -489,7 +489,6 @@ export default function AdminDashboard() {
                       <SelectValue placeholder="Select Role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Roles</SelectItem>
                       <SelectItem value="ROLE_USER">User</SelectItem>
                       <SelectItem value="ROLE_ADMIN">Admin</SelectItem>
                     </SelectContent>
