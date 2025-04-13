@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 
 interface User {
   id: number;
@@ -47,6 +48,11 @@ interface User {
   dateOfBirth: string;
   roles: {id: number; name: string}[];
   accounts: any[];
+}
+
+interface Role {
+  id: number;
+  name: string;
 }
 
 export default function AdminDashboard() {
@@ -85,6 +91,14 @@ export default function AdminDashboard() {
   const [userAccounts, setUserAccounts] = useState([]);
   const [newAccountCurrency, setNewAccountCurrency] = useState("EUR");
 
+  const [roles, setRoles] = useState<Role[]>([
+    {id: 1, name: 'ROLE_ADMIN'},
+    {id: 2, name: 'ROLE_USER'},
+  ]);
+  const [newRoleName, setNewRoleName] = useState('');
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
+  const [editedRoleName, setEditedRoleName] = useState('');
+
   useEffect(() => {
     // Mock API call to fetch users
     const fetchUsers = async () => {
@@ -111,6 +125,18 @@ export default function AdminDashboard() {
     };
 
     fetchUsers();
+
+    // Mock API call to fetch roles
+    const fetchRoles = async () => {
+      // Simulate API response
+      const mockedRoles = [
+        {id: 1, name: 'ROLE_ADMIN'},
+        {id: 2, name: 'ROLE_USER'},
+      ];
+      setRoles(mockedRoles);
+    };
+
+    fetchRoles();
   }, []);
 
   const handleInputChange = (
@@ -225,172 +251,118 @@ export default function AdminDashboard() {
         });
     };
 
-    /* const handleGetAccountHolder = async (iban: string) => {
-        // Mock API call to get the account holder
-        const accountHolder = users.find(user => user.id === 1); // Mocked user
-        if (accountHolder) {
-            toast({
-                title: "Account Holder Info",
-                description: `Account ${iban} is held by ${accountHolder.fullName}.`
-            });
-        } else {
-            toast({
-                title: "Account Holder Not Found",
-                description: `No user found for account ${iban}.`
-            });
-        }
-    }; */
+  // Role Management Handlers
+  const handleCreateRole = async () => {
+    // Mock API call to create a new role
+    const newRole = {
+      id: roles.length + 1,
+      name: newRoleName,
+    };
+    setRoles([...roles, newRole]);
+    setNewRoleName(''); // Reset input
+    toast({
+      title: 'Role created successfully!',
+      description: `A new role with name ${newRole.name} has been created.`,
+    });
+  };
+
+  const handleDeleteRole = async (roleId: number) => {
+    // Mock API call to delete a role
+    setRoles(roles.filter((role) => role.id !== roleId));
+    toast({
+      title: 'Role deleted successfully!',
+      description: `Role with ID ${roleId} has been deleted.`,
+    });
+  };
+
+  const handleEditRole = (role: Role) => {
+    setEditingRole(role);
+    setEditedRoleName(role.name);
+  };
+
+  const handleUpdateRole = async () => {
+    if (!editingRole) return;
+
+    // Mock API call to update a role
+    const updatedRole = {
+      ...editingRole,
+      name: editedRoleName,
+    };
+
+    setRoles(
+      roles.map((role) => (role.id === editingRole.id ? updatedRole : role))
+    );
+    setEditingRole(null); // Clear editing state
+    toast({
+      title: 'Role updated successfully!',
+      description: `Role with ID ${updatedRole.id} has been updated.`,
+    });
+  };
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
 
-      <Card className="w-full max-w-4xl">
-        <CardHeader>
-          <CardTitle>User Management</CardTitle>
-          <CardDescription>
-            Manage users, their roles, and accounts.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <h2 className="text-xl font-semibold mb-2">Create New User</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="fullName">Full Name</Label>
-              <Input
-                type="text"
-                id="fullName"
-                name="fullName"
-                value={newUser.fullName}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                type="email"
-                id="email"
-                name="email"
-                value={newUser.email}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="dateOfBirth">Date of Birth</Label>
-              <Input
-                type="date"
-                id="dateOfBirth"
-                name="dateOfBirth"
-                value={newUser.dateOfBirth}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                type="password"
-                id="password"
-                name="password"
-                value={newUser.password}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="role">Role</Label>
-              <Select name="role" onValueChange={(value) => handleInputChange({target: {name: 'role', value} } as any)}>
-                <SelectTrigger id="role">
-                  <SelectValue placeholder="Select Role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ROLE_USER">User</SelectItem>
-                  <SelectItem value="ROLE_ADMIN">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <Button onClick={handleCreateUser}>Create User</Button>
-
-          <h2 className="text-xl font-semibold mt-4 mb-2">Existing Users</h2>
-          <Table>
-            <TableCaption>A list of existing users in the system.</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Date of Birth</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.fullName}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.dateOfBirth}</TableCell>
-                  <TableCell>{user.roles[0].name}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleEditUser(user)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteUser(user.id)}
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleViewAccounts(user)}
-                    >
-                      View Accounts
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          {editingUser && (
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Edit User</h3>
+      <Tabs defaultValue="users" className="w-full max-w-5xl">
+        <TabsList>
+          <TabsTrigger value="users">User Management</TabsTrigger>
+          <TabsTrigger value="roles">Role Management</TabsTrigger>
+        </TabsList>
+        <TabsContent value="users">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>User Management</CardTitle>
+              <CardDescription>
+                Manage users, their roles, and accounts.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <h2 className="text-xl font-semibold mb-2">Create New User</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="editFullName">Full Name</Label>
+                  <Label htmlFor="fullName">Full Name</Label>
                   <Input
                     type="text"
-                    id="editFullName"
-                    value={editedFullName}
-                    onChange={(e) => setEditedFullName(e.target.value)}
+                    id="fullName"
+                    name="fullName"
+                    value={newUser.fullName}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="editEmail">Email</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     type="email"
-                    id="editEmail"
-                    value={editedEmail}
-                    onChange={(e) => setEditedEmail(e.target.value)}
+                    id="email"
+                    name="email"
+                    value={newUser.email}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="editDateOfBirth">Date of Birth</Label>
+                  <Label htmlFor="dateOfBirth">Date of Birth</Label>
                   <Input
                     type="date"
-                    id="editDateOfBirth"
-                    value={editedDateOfBirth}
-                    onChange={(e) => setEditedDateOfBirth(e.target.value)}
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    value={newUser.dateOfBirth}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="editRole">Role</Label>
-                  <Select value={editedRole} onValueChange={(value) => setEditedRole(value)}>
-                    <SelectTrigger id="editRole">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={newUser.password}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="role">Role</Label>
+                  <Select name="role" onValueChange={(value) => handleInputChange({target: {name: 'role', value} } as any)}>
+                    <SelectTrigger id="role">
                       <SelectValue placeholder="Select Role" />
                     </SelectTrigger>
                     <SelectContent>
@@ -400,81 +372,246 @@ export default function AdminDashboard() {
                   </Select>
                 </div>
               </div>
-              <Button onClick={handleUpdateUser} className="mt-2">
-                Update User
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              <Button onClick={handleCreateUser}>Create User</Button>
 
-      {/* User Account Management Section */}
-      {selectedUser && (
-          <Card className="w-full max-w-4xl mt-4">
+              <h2 className="text-xl font-semibold mt-4 mb-2">Existing Users</h2>
+              <Table>
+                <TableCaption>A list of existing users in the system.</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Date of Birth</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell>{user.fullName}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.dateOfBirth}</TableCell>
+                      <TableCell>{user.roles[0].name}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleEditUser(user)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          Delete
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewAccounts(user)}
+                        >
+                          View Accounts
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {editingUser && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-2">Edit User</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="editFullName">Full Name</Label>
+                      <Input
+                        type="text"
+                        id="editFullName"
+                        value={editedFullName}
+                        onChange={(e) => setEditedFullName(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="editEmail">Email</Label>
+                      <Input
+                        type="email"
+                        id="editEmail"
+                        value={editedEmail}
+                        onChange={(e) => setEditedEmail(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="editDateOfBirth">Date of Birth</Label>
+                      <Input
+                        type="date"
+                        id="editDateOfBirth"
+                        value={editedDateOfBirth}
+                        onChange={(e) => setEditedDateOfBirth(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="editRole">Role</Label>
+                      <Select value={editedRole} onValueChange={(value) => setEditedRole(value)}>
+                        <SelectTrigger id="editRole">
+                          <SelectValue placeholder="Select Role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ROLE_USER">User</SelectItem>
+                          <SelectItem value="ROLE_ADMIN">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <Button onClick={handleUpdateUser} className="mt-2">
+                    Update User
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* User Account Management Section */}
+          {selectedUser && (
+            <Card className="w-full max-w-4xl mt-4">
               <CardHeader>
-                  <CardTitle>Account Management for {selectedUser.fullName}</CardTitle>
-                  <CardDescription>
-                      Manage {selectedUser.fullName}'s accounts.
-                  </CardDescription>
+                <CardTitle>Account Management for {selectedUser.fullName}</CardTitle>
+                <CardDescription>
+                  Manage {selectedUser.fullName}'s accounts.
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                  <div className="flex items-center space-x-2 mb-4">
-                      <Label htmlFor="currency">Currency:</Label>
-                      <Select onValueChange={setNewAccountCurrency} defaultValue={newAccountCurrency}>
-                          <SelectTrigger id="currency">
-                              <SelectValue placeholder={newAccountCurrency} />
-                          </SelectTrigger>
-                          <SelectContent>
-                              <SelectItem value="USD">USD</SelectItem>
-                              <SelectItem value="BYR">BYR</SelectItem>
-                              <SelectItem value="RUB">RUB</SelectItem>
-                              <SelectItem value="EUR">EUR</SelectItem>
-                          </SelectContent>
-                      </Select>
-                      <Button onClick={handleCreateAccount}>Create New Account</Button>
-                  </div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <Label htmlFor="currency">Currency:</Label>
+                  <Select onValueChange={setNewAccountCurrency} defaultValue={newAccountCurrency}>
+                    <SelectTrigger id="currency">
+                      <SelectValue placeholder={newAccountCurrency} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USD">USD</SelectItem>
+                      <SelectItem value="BYR">BYR</SelectItem>
+                      <SelectItem value="RUB">RUB</SelectItem>
+                      <SelectItem value="EUR">EUR</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={handleCreateAccount}>Create New Account</Button>
+                </div>
 
-                  <Table>
-                      <TableCaption>A list of existing accounts for {selectedUser.fullName}.</TableCaption>
-                      <TableHeader>
-                          <TableRow>
-                              <TableHead>IBAN</TableHead>
-                              <TableHead>Balance</TableHead>
-                              <TableHead>Currency</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                          {userAccounts.map((account) => (
-                              <TableRow key={account.id}>
-                                  <TableCell>{account.iban}</TableCell>
-                                  <TableCell>{account.balance}</TableCell>
-                                  <TableCell>{account.currency}</TableCell>
-                                  <TableCell>{account.status}</TableCell>
-                                  <TableCell className="text-right">
-                                      <Button
-                                          variant="destructive"
-                                          size="sm"
-                                          onClick={() => handleDeleteAccount(account.iban)}
-                                      >
-                                          Delete
-                                      </Button>
-                                      {/* <Button
-                                          variant="secondary"
-                                          size="sm"
-                                          onClick={() => handleGetAccountHolder(account.iban)}
-                                      >
-                                          Get Account Holder
-                                      </Button> */}
-                                  </TableCell>
-                              </TableRow>
-                          ))}
-                      </TableBody>
-                  </Table>
+                <Table>
+                  <TableCaption>A list of existing accounts for {selectedUser.fullName}.</TableCaption>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>IBAN</TableHead>
+                      <TableHead>Balance</TableHead>
+                      <TableHead>Currency</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {userAccounts.map((account) => (
+                      <TableRow key={account.id}>
+                        <TableCell>{account.iban}</TableCell>
+                        <TableCell>{account.balance}</TableCell>
+                        <TableCell>{account.currency}</TableCell>
+                        <TableCell>{account.status}</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteAccount(account.iban)}
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="roles">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Role Management</CardTitle>
+              <CardDescription>Manage roles within the system.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <h2 className="text-xl font-semibold mb-2">Create New Role</h2>
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                <div>
+                  <Label htmlFor="roleName">Role Name</Label>
+                  <Input
+                    type="text"
+                    id="roleName"
+                    name="roleName"
+                    value={newRoleName}
+                    onChange={(e) => setNewRoleName(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button onClick={handleCreateRole}>Create Role</Button>
+
+              <h2 className="text-xl font-semibold mt-4 mb-2">Existing Roles</h2>
+              <Table>
+                <TableCaption>A list of existing roles in the system.</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {roles.map((role) => (
+                    <TableRow key={role.id}>
+                      <TableCell>{role.name}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleEditRole(role)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteRole(role.id)}
+                        >
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {editingRole && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-2">Edit Role</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="editRoleName">Role Name</Label>
+                      <Input
+                        type="text"
+                        id="editRoleName"
+                        value={editedRoleName}
+                        onChange={(e) => setEditedRoleName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <Button onClick={handleUpdateRole} className="mt-2">
+                    Update Role
+                  </Button>
+                </div>
+              )}
+            </CardContent>
           </Card>
-      )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
