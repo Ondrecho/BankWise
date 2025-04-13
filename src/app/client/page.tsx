@@ -96,7 +96,7 @@ export default function ClientDashboard() {
               setUpdatedDateOfBirth(data.dateOfBirth);
               setDate(new Date(data.dateOfBirth)); // Convert the date string to a Date object
             } else {
-              console.error("Response has no content");
+              console.warn("Response has no content");
               toast({
                 variant: "destructive",
                 title: "Failed to fetch profile",
@@ -104,7 +104,7 @@ export default function ClientDashboard() {
               })
             }
           } else {
-            console.error("Response is not JSON");
+            console.warn("Response is not JSON");
             toast({
               variant: "destructive",
               title: "Failed to fetch profile",
@@ -112,7 +112,7 @@ export default function ClientDashboard() {
             })
           }
         } else {
-          console.error('Failed to fetch profile');
+          console.warn('Failed to fetch profile');
           toast({
             variant: "destructive",
             title: "Failed to fetch profile",
@@ -325,10 +325,7 @@ export default function ClientDashboard() {
                   <p>Email: {profile.email}</p>
                   <p>Date of Birth: {profile.dateOfBirth}</p>
                 </div>
-                <Button onClick={() => setOpen(true)}>Edit Profile</Button>
-              </div>
-
-              <AlertDialog open={open} onOpenChange={setOpen}>
+                <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogTrigger asChild>
                   <Button variant="outline">Edit Profile</Button>
                 </AlertDialogTrigger>
@@ -390,6 +387,7 @@ export default function ClientDashboard() {
                   </Form>
                 </AlertDialogContent>
               </AlertDialog>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
