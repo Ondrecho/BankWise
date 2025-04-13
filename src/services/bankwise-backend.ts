@@ -184,6 +184,29 @@ export async function closeAccount(iban: string): Promise<Response> {
   return response;
 }
 
+export async function createAccountForUser(userId: number, currency: string): Promise<Account> {
+  const url = `http://localhost:8080/api/admin/users/${userId}/accounts?currency=${currency}`;
+  console.log('Constructed URL:', url);
+  console.log('Request Headers:', { 'Authorization': `Bearer ${credentials.token}` });
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${credentials.token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  console.log('Response Status:', response.status);
+  const responseBody = await response.text();
+  console.log('Response Body:', responseBody);
+
+  if (!response.ok) {
+    throw new Error(`Failed to create account for user: ${response.statusText}`);
+  }
+  return await response.json() as Account;
+}
+
 export async function openAccount(iban: string): Promise<Response> {
   const url = `http://localhost:8080/api/accounts/${iban}/open`;
   const response = await fetch(url, {

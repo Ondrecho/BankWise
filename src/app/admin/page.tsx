@@ -52,7 +52,7 @@ import {
 import { useRouter } from "next/navigation";
 import { 
   getUsers, createUser, updateUser, deleteUser, getRoles, createRole, updateRole, deleteRole, getUserAccounts, closeAccount,
-  User, Role, Account, generateLogs, checkLogStatus, getPageVisitCount, getOverallStatistics, createAccount, deleteAccount, openAccount
+  User, Role, Account, generateLogs, checkLogStatus, getPageVisitCount, getOverallStatistics, createAccountForUser, deleteAccount, openAccount
 } from "@/services/bankwise-backend";
 
 export default function AdminDashboard() {
@@ -72,7 +72,7 @@ export default function AdminDashboard() {
   const [editedRole, setEditedRole] = useState('ROLE_USER');
   const [selectedUserId, setSelectedUserId] = useState<User | null>(null);
   const [userAccounts, setUserAccounts] = useState<Account[]>([]);
-  const [newAccountCurrency, setNewAccountCurrency] = useState("EUR");
+  const [newAccountCurrency, setNewAccountCurrency] = useState("BYN");
   const [roles, setRoles] = useState<Role[]>([]);
   const [newRoleName, setNewRoleName] = useState('');
   const [editingRole, setEditingRole] = useState<Role | null>(null);
@@ -171,7 +171,7 @@ export default function AdminDashboard() {
       role: editedRole,
     };
     try {
-      const result = await updateUser(updatedUser);
+      const result = await updateUser(editingUser.id, updatedUser);
       setUsers(users.map((user) => (user.id === editingUser.id ? result : user)));
       setEditingUser(null);
       toast({ title: 'User updated successfully!', description: `User with ID ${result.id} has been updated.` });
@@ -200,7 +200,12 @@ export default function AdminDashboard() {
     }
   };
 
+  useEffect(() => {
+    console.log("User Accounts updated:", userAccounts);
+  }, [userAccounts]);
+
   const handleCreateAccount = async () => {
+    console.log("handleCreateAccount called");
     if (!selectedUserId) {
       toast({
         title: "No user selected!",
@@ -209,15 +214,24 @@ export default function AdminDashboard() {
       });
       return;
     }
+    
     try {
-      const newAccount = await createAccount(selectedUserId.id, { currency: newAccountCurrency });
+      // Use the existing service function
+      const newAccount = await createAccountForUser(selectedUserId.id, newAccountCurrency);
+      
+      // Update the UI with the new account
       setUserAccounts([...userAccounts, newAccount]);
       toast({
         title: "Account created!",
         description: `A new account with currency ${newAccountCurrency} has been created.`,
       });
     } catch (error: any) {
-      toast({ title: "Failed to create account!", description: error.message, variant: "destructive" });
+      console.error("Error creating account:", error);
+      toast({ 
+        title: "Error creating account", 
+        description: error.message, 
+        variant: "destructive" 
+      });
     }
   };
 
@@ -383,6 +397,27 @@ export default function AdminDashboard() {
             console.error("Failed to open account:", error);
             toast({
                 title: "Failed to open account!",
+                description: error.message,
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleDeleteAccount = async (iban: string) => {
+        try {
+            await deleteAccount(iban);
+            // Optimistically update the UI by removing the deleted account
+            setUserAccounts(prevAccounts => prevAccounts.filter(account => account.iban !== iban));
+            toast({
+                title: "Account deleted!",
+                description: `Account with IBAN ${iban} has been deleted.`,
+            });
+            // Refresh accounts after deletion
+            if (selectedUserId) await handleViewAccounts(selectedUserId);
+        } catch (error: any) {
+            console.error("Failed to delete account:", error);
+            toast({
+                title: "Failed to delete account!",
                 description: error.message,
                 variant: "destructive",
             });
@@ -609,7 +644,7 @@ export default function AdminDashboard() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="USD">USD</SelectItem>
-                      <SelectItem value="BYR">BYR</SelectItem>
+                      <SelectItem value="BYN">BYN</SelectItem>
                       <SelectItem value="RUB">RUB</SelectItem>
                       <SelectItem value="EUR">EUR</SelectItem>
                     </SelectContent>
@@ -638,10 +673,13 @@ export default function AdminDashboard() {
                           {account.status === "CLOSED" ? (
                             <>
                               <Button variant="outline" size="sm" onClick={() => handleOpenAccount(account.iban)}>Open</Button>
-                              <Button variant="destructive" size="sm" onClick={() => deleteAccount(account.iban)}>Delete</Button>
+                              <Button variant="destructive" size="sm" onClick={() => handleDeleteAccount(account.iban)}>Delete</Button>
                             </>
                           ) : ( // Changed this line
-                            <Button variant="secondary" size="sm" onClick={() => handleCloseAccount(account.iban)}>Close</Button>
+                            <>
+                              <Button variant="secondary" size="sm" onClick={() => handleCloseAccount(account.iban)}>Close</Button>
+                              <Button variant="destructive" size="sm" onClick={() => handleDeleteAccount(account.iban)}>Delete</Button>
+                            </>
                           )}
                         </TableCell>
                       </TableRow>
@@ -804,3 +842,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

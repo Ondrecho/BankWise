@@ -441,7 +441,7 @@ export default function ClientDashboard() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="BYR">BYR</SelectItem>
+                    <SelectItem value="BYN">BYN</SelectItem>
                     <SelectItem value="RUB">RUB</SelectItem>
                     <SelectItem value="EUR">EUR</SelectItem>
                   </SelectContent>
