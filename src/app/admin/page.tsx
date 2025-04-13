@@ -225,7 +225,7 @@ export default function AdminDashboard() {
         });
     };
 
-    const handleGetAccountHolder = async (iban: string) => {
+    /* const handleGetAccountHolder = async (iban: string) => {
         // Mock API call to get the account holder
         const accountHolder = users.find(user => user.id === 1); // Mocked user
         if (accountHolder) {
@@ -239,7 +239,7 @@ export default function AdminDashboard() {
                 description: `No user found for account ${iban}.`
             });
         }
-    };
+    }; */
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
@@ -460,13 +460,13 @@ export default function AdminDashboard() {
                                       >
                                           Delete
                                       </Button>
-                                      <Button
+                                      {/* <Button
                                           variant="secondary"
                                           size="sm"
                                           onClick={() => handleGetAccountHolder(account.iban)}
                                       >
                                           Get Account Holder
-                                      </Button>
+                                      </Button> */}
                                   </TableCell>
                               </TableRow>
                           ))}
@@ -478,4 +478,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
