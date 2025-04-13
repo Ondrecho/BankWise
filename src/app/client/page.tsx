@@ -11,6 +11,42 @@ import {Separator} from "@/components/ui/separator";
 import {Calendar} from "@/components/ui/calendar";
 import {format} from "date-fns";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Switch } from "@/components/ui/switch"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+
+const profileFormSchema = z.object({
+  fullName: z.string().min(2, {
+    message: "Fullname must be at least 2 characters.",
+  }),
+  email: z.string().email({
+    message: "Please enter a valid email.",
+  }),
+  dateOfBirth: z.string(),
+  password: z.string().optional(),
+})
 
 export default function ClientDashboard() {
   const [accounts, setAccounts] = useState([]);
@@ -31,6 +67,22 @@ export default function ClientDashboard() {
   const [updatedPassword, setUpdatedPassword] = useState('');
   const [date, setDate] = useState<Date | undefined>(new Date());
   const {toast} = useToast();
+  const [open, setOpen] = React.useState(false)
+
+  const form = useForm<z.infer<typeof profileFormSchema>>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      fullName: profile.fullName,
+      email: profile.email,
+      dateOfBirth: profile.dateOfBirth,
+    },
+  })
+
+  useEffect(() => {
+    form.setValue("fullName", profile.fullName);
+    form.setValue("email", profile.email);
+    form.setValue("dateOfBirth", profile.dateOfBirth);
+  }, [profile, form.setValue]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -40,13 +92,27 @@ export default function ClientDashboard() {
           const contentType = response.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
             const data = await response.json();
-            setProfile(data);
-            setUpdatedFullName(data.fullName);
-            setUpdatedEmail(data.email);
-            setUpdatedDateOfBirth(data.dateOfBirth);
-            setDate(new Date(data.dateOfBirth)); // Convert the date string to a Date object
+            if (data) {
+              setProfile(data);
+              setUpdatedFullName(data.fullName);
+              setUpdatedEmail(data.email);
+              setUpdatedDateOfBirth(data.dateOfBirth);
+              setDate(new Date(data.dateOfBirth)); // Convert the date string to a Date object
+            } else {
+              console.error("Response has no content");
+              toast({
+                variant: "destructive",
+                title: "Failed to fetch profile",
+                description: "The profile data is empty."
+              })
+            }
           } else {
             console.error("Response is not JSON");
+            toast({
+              variant: "destructive",
+              title: "Failed to fetch profile",
+              description: "The response is not in JSON format."
+            })
           }
         } else {
           console.error('Failed to fetch profile');
@@ -97,7 +163,7 @@ export default function ClientDashboard() {
     fetchAccounts();
   }, []);
 
-  const handleUpdateProfile = async () => {
+  const handleUpdateProfile = async (values: z.infer<typeof profileFormSchema>) => {
     try {
       const response = await fetch('/api/user/profile', {
         method: 'PATCH',
@@ -105,10 +171,10 @@ export default function ClientDashboard() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          fullName: updatedFullName,
-          email: updatedEmail,
-          dateOfBirth: updatedDateOfBirth,
-          password: updatedPassword, // Include the password in the update
+          fullName: values.fullName,
+          email: values.email,
+          dateOfBirth: values.dateOfBirth,
+          password: values.password, // Include the password in the update
         }),
       });
 
@@ -201,6 +267,38 @@ export default function ClientDashboard() {
     }
   };
 
+  const handleOpenAccount = async (iban: string) => {
+    try {
+      const response = await fetch(`/api/accounts/${iban}/open`, {
+        method: 'PATCH',
+      });
+
+      if (response.ok) {
+        setAccounts(accounts.map(account =>
+          account.iban === iban ? {...account, status: 'ACTIVE'} : account
+        ));
+        toast({
+          title: "Account opened successfully!",
+          description: `Account with IBAN ${iban} has been opened.`
+        });
+      } else {
+        console.error('Failed to open account');
+        toast({
+          variant: "destructive",
+          title: "Failed to open account",
+          description: `There was an error opening account with IBAN ${iban}.`
+        });
+      }
+    } catch (error) {
+      console.error('Error opening account:', error);
+      toast({
+        variant: "destructive",
+        title: "Error opening account",
+        description: "An unexpected error occurred."
+      });
+    }
+  };
+
   const handleTransaction = (accountId: string, type: string) => {
     alert(`Transaction type ${type} for account ${accountId}`);
   };
@@ -212,7 +310,7 @@ export default function ClientDashboard() {
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
       <h1 className="text-3xl font-bold mb-4">Client Dashboard</h1>
 
-      <Tabs defaultValue="profile" className="w-full max-w-2xl">
+      <Tabs defaultValue="profile" className="w-full max-w-3xl">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="accounts">Accounts</TabsTrigger>
@@ -224,89 +322,77 @@ export default function ClientDashboard() {
               <CardTitle>Profile Information</CardTitle>
             </CardHeader>
             <CardContent>
-              {!isEditing ? (
-                <>
-                  <div className="flex justify-between items-center mb-4">
-                    <div>
-                      <p>Full Name: {profile.fullName}</p>
-                      <p>Email: {profile.email}</p>
-                      <p>Date of Birth: {profile.dateOfBirth}</p>
-                    </div>
-                    <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="grid gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input
-                        id="name"
-                        value={updatedFullName}
-                        onChange={(e) => setUpdatedFullName(e.target.value)}
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <p>Full Name: {profile.fullName}</p>
+                  <p>Email: {profile.email}</p>
+                  <p>Date of Birth: {profile.dateOfBirth}</p>
+                </div>
+                <Button onClick={() => setOpen(true)}>Edit Profile</Button>
+              </div>
+
+              <AlertDialog open={open} onOpenChange={setOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline">Edit Profile</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Edit Profile</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Make changes to your profile here. Click save when you're done.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleUpdateProfile)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="fullName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Full Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Full Name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={updatedEmail}
-                        onChange={(e) => setUpdatedEmail(e.target.value)}
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-[240px] justify-start text-left font-normal",
-                              !date && "text-muted-foreground"
-                            )}
-                          >
-                            {date ? format(date, "PPP") : <span>Pick a date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={setDate}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <Input
-                        type="hidden"
-                        id="dateOfBirth"
-                        value={date ? format(date, "yyyy-MM-dd") : ''}
-                        onChange={(e) => setUpdatedDateOfBirth(e.target.value)}
+                      <FormField
+                        control={form.control}
+                        name="dateOfBirth"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Date of Birth</FormLabel>
+                            <FormControl>
+                              <Input type="date" placeholder="Date of Birth" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="password">Password</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="New Password"
-                        value={updatedPassword}
-                        onChange={(e) => setUpdatedPassword(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-2 mt-4">
-                    <Button variant="secondary" onClick={() => setIsEditing(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleUpdateProfile}>Update Profile</Button>
-                  </div>
-                </>
-              )}
+                      <div className="flex justify-end">
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction type="submit">Save</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </div>
+                    </form>
+                  </Form>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardContent>
           </Card>
         </TabsContent>
@@ -355,6 +441,11 @@ export default function ClientDashboard() {
                       <li key={account.id} className="mb-2">
                         IBAN: {account.iban}, Balance: {account.balance}, Currency:{' '}
                         {account.currency}, Status: {account.status}
+                          <div className="flex gap-2 mt-2">
+                            <Button onClick={() => handleOpenAccount(account.iban)}>
+                              Open Account
+                            </Button>
+                          </div>
                       </li>
                     ))}
                   </ul>
