@@ -323,11 +323,11 @@ export default function ClientDashboard() {
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
-      <div className="w-full flex justify-end pr-4">
-        <Button variant="secondary" onClick={handleLogout}>
-          Logout
-        </Button>
-      </div>
+       <div className="w-full flex justify-end pr-4">
+            <Button variant="secondary" onClick={handleLogout}>
+                Logout
+            </Button>
+        </div>
       <h1 className="text-3xl font-bold mb-4">Client Dashboard</h1>
 
       <Tabs defaultValue="profile" className="w-full max-w-3xl">
