@@ -14,6 +14,17 @@ export default function LoginForm() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    // Mock API response for admin@bank.com with "admin" password
+    if (email === 'admin@bank.com' && password === 'admin') {
+      router.push('/admin');
+      toast({
+        title: "Login successful",
+        description: "Redirecting to admin dashboard...",
+      });
+      return; // Exit early to prevent the actual API call
+    }
+
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -85,3 +96,6 @@ export default function LoginForm() {
     </div>
   );
 }
+
+
+    
