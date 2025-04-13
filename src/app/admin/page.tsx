@@ -49,42 +49,15 @@ import {
     Tooltip,
     XAxis,
     YAxis
-} from "recharts";
+} from 'recharts';
 import {useRouter} from "next/navigation";
-
-interface User {
-  id: number;
-  fullName: string;
-  email: string;
-  dateOfBirth: string;
-  roles: {id: number; name: string}[];
-  accounts: any[];
-}
-
-interface Role {
-  id: number;
-  name: string;
-}
+import {
+  getUsers, createUser, updateUser, deleteUser, getRoles, createRole, updateRole, deleteRole, getUserAccounts,
+  User, Role, Account, generateLogs, checkLogStatus, getPageVisitCount, getOverallStatistics
+} from "@/services/bankwise-backend";
 
 export default function AdminDashboard() {
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      fullName: 'John Doe',
-      email: 'john.doe@example.com',
-      dateOfBirth: '1990-01-01',
-      roles: [{id: 1, name: 'ROLE_ADMIN'}],
-      accounts: [],
-    },
-    {
-      id: 2,
-      fullName: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      dateOfBirth: '1992-05-10',
-      roles: [{id: 2, name: 'ROLE_USER'}],
-      accounts: [],
-    },
-  ]);
+  const [users, setUsers] = useState<User[]>([]);
   const [newUser, setNewUser] = useState({
     fullName: '',
     email: '',
@@ -98,14 +71,11 @@ export default function AdminDashboard() {
   const [editedEmail, setEditedEmail] = useState('');
   const [editedDateOfBirth, setEditedDateOfBirth] = useState('');
   const [editedRole, setEditedRole] = useState('ROLE_USER');
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [userAccounts, setUserAccounts] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState<User | null>(null);
+  const [userAccounts, setUserAccounts] = useState<Account[]>([]);
   const [newAccountCurrency, setNewAccountCurrency] = useState("EUR");
 
-  const [roles, setRoles] = useState<Role[]>([
-    {id: 1, name: 'ROLE_ADMIN'},
-    {id: 2, name: 'ROLE_USER'},
-  ]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [newRoleName, setNewRoleName] = useState('');
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [editedRoleName, setEditedRoleName] = useState('');
@@ -116,12 +86,7 @@ export default function AdminDashboard() {
   const [logStatus, setLogStatus] = useState('');
   const [downloadLink, setDownloadLink] = useState('');
 
-  // Stats Management
-  const [pageStats, setPageStats] = useState({
-    "/dashboard": 150,
-    "/profile": 80,
-    "/transactions": 45
-  });
+  const [pageStats, setPageStats] = useState<{ [key: string]: number }>({});
   const [pageVisitCount, setPageVisitCount] = useState(0);
   const [pageUrl, setPageUrl] = useState("/dashboard"); // Default URL
 
@@ -129,105 +94,70 @@ export default function AdminDashboard() {
     const [fullNameFilter, setFullNameFilter] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
 
-  const router = useRouter();
+    const router = useRouter();
 
-  useEffect(() => {
-    // Mock API call to fetch users
-    const fetchUsers = async () => {
-        let filteredUsers = [
-            {
-                id: 1,
-                fullName: 'John Doe',
-                email: 'john.doe@example.com',
-                dateOfBirth: '1990-01-01',
-                roles: [{id: 1, name: 'ROLE_ADMIN'}],
-                accounts: [],
-            },
-            {
-                id: 2,
-                fullName: 'Jane Smith',
-                email: 'jane.smith@example.com',
-                dateOfBirth: '1992-05-10',
-                roles: [{id: 2, name: 'ROLE_USER'}],
-                accounts: [],
-            },
-        ];
-
-        // Apply full name filter
-        if (fullNameFilter) {
-            filteredUsers = filteredUsers.filter(user =>
-                user.fullName.toLowerCase().includes(fullNameFilter.toLowerCase())
-            );
+    const loadUsers = async () => {
+        console.log("loadUsers called");
+        try {
+            const fetchedUsers = await getUsers(fullNameFilter, roleFilter);
+            setUsers(fetchedUsers);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            toast({
+                title: "Error fetching users!",
+            });
         }
-
-        // Apply role filter
-        if (roleFilter) {
-            filteredUsers = filteredUsers.filter(user =>
-                user.roles.some(role => role.name === roleFilter)
-            );
-        }
-
-        setUsers(filteredUsers);
     };
-
-    fetchUsers();
-
-    // Mock API call to fetch roles
-    const fetchRoles = async () => {
-      // Simulate API response
-      const mockedRoles = [
-        {id: 1, name: 'ROLE_ADMIN'},
-        {id: 2, name: 'ROLE_USER'},
-      ];
-      setRoles(mockedRoles);
-    };
-
-    fetchRoles();
-
-    // Mock API call to fetch statistics
-    const fetchStats = async () => {
-      // Simulate API response
-      const mockedStats = {
-        "/dashboard": 150,
-        "/profile": 80,
-        "/transactions": 45
-      };
-      setPageStats(mockedStats);
-    };
-
-    fetchStats();
-  }, [fullNameFilter, roleFilter]);
-
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setNewUser({...newUser, [event.target.name]: event.target.value});
-  };
+  }
 
+  // User Management Handlers
   const handleCreateUser = async () => {
-    // Mock API call to create a user
-    const newUserWithId = {
-      ...newUser,
-      id: users.length + 1,
-      roles: [{name: newUser.role, id: 3}],
-      accounts: [],
-    };
-    setUsers([...users, newUserWithId]);
-    setNewUser({fullName: '', email: '', dateOfBirth: '', password: '', role: 'ROLE_USER'}); // Reset form
-    toast({
-      title: 'User created successfully!',
-      description: `A new user with email ${newUser.email} has been created.`,
-    });
+    try {
+      const createdUser = await createUser(newUser);
+      setUsers([...users, createdUser]);
+      setNewUser({fullName: '', email: '', dateOfBirth: '', password: '', role: 'ROLE_USER'}); // Reset form
+      toast({
+        title: 'User created successfully!',
+        description: `A new user with email ${createdUser.email} has been created.`,
+      });
+    } catch (error) {
+      console.error('Failed to create user:', error);
+      toast({
+        title: 'Failed to create user!',
+        description: 'Please check the provided information and try again.',
+        variant: 'destructive',
+      });
+    }
+    console.log("User created");
   };
 
-  const handleDeleteUser = async (userId: number) => {
-    // Mock API call to delete a user
-    setUsers(users.filter((user) => user.id !== userId));
-    toast({
-      title: 'User deleted successfully!',
-      description: `User with ID ${userId} has been deleted.`,
-    });
-  };
+    const handleDeleteUser = async (userId: number) => {
+        if (typeof userId !== 'number') {
+            console.error('Invalid userId:', userId);
+            toast({
+                title: 'Invalid User ID',
+                description: 'The provided User ID is not valid.',
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        try {
+            await deleteUser(userId);
+            setUsers(users.filter((user) => user.id !== userId));
+            toast({
+                title: 'User Deleted',
+                description: `User with ID ${userId} has been successfully deleted.`,
+            });
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            toast({ title: 'Failed to delete user!', description: 'Please try again.', variant: 'destructive' });
+        }
+    };
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
@@ -240,98 +170,89 @@ export default function AdminDashboard() {
   const handleUpdateUser = async () => {
     if (!editingUser) return;
 
-    // Mock API call to update a user
     const updatedUser = {
       ...editingUser,
       fullName: editedFullName,
       email: editedEmail,
       dateOfBirth: editedDateOfBirth,
-      roles: [{name: editedRole, id: 3}],
+      role: editedRole,
     };
-
-    setUsers(
-      users.map((user) => (user.id === editingUser.id ? updatedUser : user))
-    );
-    setEditingUser(null); // Clear editing state
-    toast({
-      title: 'User updated successfully!',
-      description: `User with ID ${updatedUser.id} has been updated.`,
-    });
+    try {
+      const result = await updateUser(updatedUser);
+      setUsers(users.map((user) => (user.id === editingUser.id ? result : user)));
+      setEditingUser(null);
+      toast({title: 'User updated successfully!', description: `User with ID ${result.id} has been updated.`});
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      toast({title: 'Failed to update user!', description: 'Please try again.', variant: 'destructive'});
+    }
+    console.log("User updated");
   };
 
-    const handleViewAccounts = async (user: User) => {
-        setSelectedUser(user);
+  const handleViewAccounts = async (user: User) => {
+      setSelectedUserId(user);
+      try {
+          const accounts = await getUserAccounts(user.id);
+          setUserAccounts(accounts);
+          toast({title: 'Accounts loaded successfully!', description: `Accounts for ${user.fullName} loaded.`});
 
-        // Mock API call to fetch user accounts
-        const mockedAccounts = [
-            {
-                id: 101,
-                iban: 'DE12345678901234567890',
-                balance: 5000,
-                currency: 'EUR',
-                status: 'ACTIVE'
-            },
-            {
-                id: 102,
-                iban: 'US98765432109876543210',
-                balance: 7500,
-                currency: 'USD',
-                status: 'ACTIVE'
-            }
-        ];
-        setUserAccounts(mockedAccounts);
-    };
+      } catch (error: any) {
+          setUserAccounts([]);
+          // Keep selectedUserId so the section doesn't disappear
+          console.error('Failed to fetch user accounts:', error);
+      toast({
+        title: 'Failed to fetch accounts!',
+          description: 'Could not retrieve accounts for this user.',
+          variant: 'destructive',
+      });
+    }
+  };
 
-    const handleCreateAccount = async () => {
-        if (!selectedUser) return;
-
-        // Mock API call to create a new account for the selected user
-        const newAccount = {
-            id: userAccounts.length + 1,
-            iban: 'MockedIBAN' + (userAccounts.length + 1),
-            balance: 0,
-            currency: newAccountCurrency,
-            status: 'ACTIVE'
-        };
-
-        setUserAccounts([...userAccounts, newAccount]);
-        toast({
-            title: "Account created successfully!",
-            description: `A new account with IBAN ${newAccount.iban} has been created for ${selectedUser.fullName}.`
-        });
-    };
-
-    const handleDeleteAccount = async (iban: string) => {
-        // Mock API call to delete an account
-        setUserAccounts(userAccounts.filter(account => account.iban !== iban));
-        toast({
-            title: "Account deleted successfully!",
-            description: `Account with IBAN ${iban} has been deleted.`
-        });
-    };
+  const handleCreateAccount = async () => {
+    // Implement the real server request here
+    // Example: await deleteAccount(iban);
+    toast({
+      title: "Account deletion not implemented!",
+      description: "This feature is not yet implemented.",
+    });
+  }
 
   // Role Management Handlers
   const handleCreateRole = async () => {
-    // Mock API call to create a new role
-    const newRole = {
-      id: roles.length + 1,
-      name: newRoleName,
-    };
-    setRoles([...roles, newRole]);
-    setNewRoleName(''); // Reset input
-    toast({
-      title: 'Role created successfully!',
-      description: `A new role with name ${newRole.name} has been created.`,
-    });
+    try {
+      const createdRole = await createRole({ name: newRoleName }); // Assuming createRole takes a Role object
+          setRoles([...roles, createdRole]);
+      setNewRoleName(''); // Reset input
+      toast({
+        title: 'Role created successfully!',
+        description: `A new role with name ${createdRole.name} has been created.`,
+      });
+    } catch (error) {
+      console.error('Failed to create role:', error);
+      toast({
+        title: 'Failed to create role!',
+        description: 'Please check the provided information and try again.',
+        variant: 'destructive',
+      });
+    }    
   };
 
   const handleDeleteRole = async (roleId: number) => {
-    // Mock API call to delete a role
-    setRoles(roles.filter((role) => role.id !== roleId));
-    toast({
-      title: 'Role deleted successfully!',
-      description: `Role with ID ${roleId} has been deleted.`,
-    });
+      try {
+          await deleteRole(roleId);
+          setRoles(roles.filter((role) => role.id !== roleId));
+          toast({
+              title: 'Role deleted successfully!',
+              description: `Role with ID ${roleId} has been deleted.`,
+          });
+      } catch (error) {
+          console.error('Failed to delete role:', error);
+          toast({
+              title: 'Failed to delete role!',
+              description: 'Please try again.',
+              variant: 'destructive',
+          });
+      }    
   };
 
   const handleEditRole = (role: Role) => {
@@ -342,97 +263,57 @@ export default function AdminDashboard() {
   const handleUpdateRole = async () => {
     if (!editingRole) return;
 
-    // Mock API call to update a role
-    const updatedRole = {
-      ...editingRole,
-      name: editedRoleName,
-    };
-
-    setRoles(
-      roles.map((role) => (role.id === editingRole.id ? updatedRole : role))
-    );
-    setEditingRole(null); // Clear editing state
-    toast({
-      title: 'Role updated successfully!',
-      description: `Role with ID ${updatedRole.id} has been updated.`,
-    });
+      try {
+      const updatedRole = await updateRole({ ...editingRole, name: editedRoleName }); // Assuming updateRole takes a Role object
+      if (updatedRole) {
+        setRoles(
+          roles.map((role) => (role.id === editingRole.id ? updatedRole : role))
+        );
+        setEditingRole(null); // Clear editing state
+        toast({
+          title: 'Role updated successfully!',
+          description: `Role with ID ${updatedRole.id} has been updated.`,
+        });
+      } else {
+        toast({
+          title: 'Failed to update role!',
+          description: 'Role not found or update failed.',
+          variant: 'destructive',
+        });
+      }      
+    } catch (error) {
+      console.error('Failed to update role:', error);
+      toast({title: 'Failed to update role!', description: 'Please try again.', variant: 'destructive'});
+    }
   };
 
   // Logs Management Handlers
   const handleGenerateLogs = async () => {
-    // Mock API call to generate logs
-    const mockedTaskId = '550e8400-e29b-41d4-a716-446655440000';
-    setTaskId(mockedTaskId);
-    setLogStatus('PENDING');
-
+    // Implement real server request to generate logs
+    // Example: const taskId = await generateLogs(logDate);
     toast({
-      title: 'Log generation started!',
-      description: `Task ID: ${mockedTaskId}. Check status to download.`,
+      title: "Log generation not implemented!",
+      description: "This feature is not yet implemented.",
     });
+  }
 
-    // Simulate asynchronous log generation status check
-    setTimeout(async () => {
-      // Mock API call to check log generation status
-      const mockedStatus = 'COMPLETED';
-      const mockedProgress = 100;
-
-      setLogStatus(mockedStatus);
-
-      if (mockedStatus === 'COMPLETED') {
-        // Mock API call to get the log file
-        const mockedDownloadLink = '/api/logs/download/' + mockedTaskId;
-        setDownloadLink(mockedDownloadLink);
-
-        toast({
-          title: 'Log generation completed!',
-          description: `Logs for ${logDate} are ready to download.`,
-        });
-      } else {
-        toast({
-          title: 'Log generation failed!',
-          description: `Failed to generate logs for ${logDate}.`,
-          variant: "destructive",
-        });
-      }
-    }, 5000); // Simulate 5 seconds of log generation
-  };
-
-  const handleCheckStatus = async () => {
-    // Mock API call to check log generation status
-    const mockedStatus = 'COMPLETED';
-    const mockedProgress = 100;
-
-    setLogStatus(mockedStatus);
-
-    if (mockedStatus === 'COMPLETED') {
-      // Mock API call to get the log file
-      const mockedDownloadLink = '/api/logs/download/' + taskId;
-      setDownloadLink(mockedDownloadLink);
-
-      toast({
-        title: 'Log generation completed!',
-        description: `Logs for ${logDate} are ready to download.`,
-      });
-    } else {
-      toast({
-        title: 'Log generation pending!',
-        description: `Log generation is still pending for ${logDate}.`,
-      });
-    }
-  };
+  const handleCheckStatus = async () => {};
 
   // Stats Management Handlers
   const handleGetPageVisitCount = async () => {
-    // Mock API call to get page visit count
-    const mockedCount = Math.floor(Math.random() * 200);
-    setPageVisitCount(mockedCount);
-
-    toast({
-      title: 'Page visit count fetched!',
-      description: `Page ${pageUrl} has ${mockedCount} visits.`,
-    });
-  };
-
+    try {
+      const count = await getPageVisitCount(pageUrl);
+      setPageVisitCount(count);
+      toast({
+        title: 'Page visit count fetched!',
+        description: `Page ${pageUrl} has ${count} visits.`,
+      });
+    } catch (error) {
+      console.error('Failed to fetch page visit count:', error);
+      toast({ title: 'Failed to fetch visit count!', description: 'Please try again.', variant: 'destructive' });
+    }
+  }
+  
   const renderBarChart = (data: { [key: string]: number }) => {
     const chartData = Object.entries(data).map(([url, count]) => ({
       url,
@@ -451,18 +332,17 @@ export default function AdminDashboard() {
         </BarChart>
       </ResponsiveContainer>
     );
+  }
+
+  const handleLogout = async () => {
+      localStorage.removeItem('credentials'); // Clear credentials from local storage
+      router.push('/login'); // Redirect to the login page
+      toast({
+          title: "Logged out",
+          description: "You have been successfully logged out.",
+      });
   };
-
-    const handleLogout = () => {
-        // Implement logout logic here, such as clearing tokens or session data
-        // For now, just redirect to the home page
-        router.push('/');
-        toast({
-            title: "Logged out",
-            description: "You have been successfully logged out.",
-        })
-    };
-
+  
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
@@ -485,6 +365,7 @@ export default function AdminDashboard() {
                 Manage users, their roles, and accounts.
               </CardDescription>
             </CardHeader>
+
             <CardContent className="grid gap-4">
               {/* Filtering Options */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -568,6 +449,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <Button onClick={handleCreateUser}>Create User</Button>
+              
+              <Button onClick={loadUsers} className="mt-4">Load Users</Button>
 
               <h2 className="text-xl font-semibold mt-4 mb-2">Existing Users</h2>
               <Table>
@@ -603,13 +486,15 @@ export default function AdminDashboard() {
                         >
                           Delete
                         </Button>
-                        <Button
+                        {selectedUserId !== user.id && (
+                          <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleViewAccounts(user)}
-                        >
-                          View Accounts
-                        </Button>
+                            onClick={() => handleViewAccounts(user)}>
+                            View Accounts
+                          </Button>
+                        )}
+
                       </TableCell>
                     </TableRow>
                   ))}
@@ -651,7 +536,7 @@ export default function AdminDashboard() {
                       <Select value={editedRole} onValueChange={(value) => setEditedRole(value)}>
                         <SelectTrigger id="editRole">
                           <SelectValue placeholder="Select Role" />
-                        </SelectTrigger>
+                      </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="ROLE_USER">User</SelectItem>
                           <SelectItem value="ROLE_ADMIN">Admin</SelectItem>
@@ -667,13 +552,14 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
+
           {/* User Account Management Section */}
-          {selectedUser && (
-            <Card className="w-full max-w-4xl mt-4">
+          {selectedUserId && (
+              <Card className="w-full max-w-4xl mt-4">
               <CardHeader>
-                <CardTitle>Account Management for {selectedUser.fullName}</CardTitle>
+                  <CardTitle>Account Management for {selectedUserId.fullName}</CardTitle>
                 <CardDescription>
-                  Manage {selectedUser.fullName}'s accounts.
+                  Manage {selectedUserId.fullName}'s accounts.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -694,7 +580,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <Table>
-                  <TableCaption>A list of existing accounts for {selectedUser.fullName}.</TableCaption>
+                  <TableCaption>A list of existing accounts for {selectedUserId.fullName}.</TableCaption>
                   <TableHeader>
                     <TableRow>
                       <TableHead>IBAN</TableHead>

@@ -6,7 +6,6 @@ import {useRouter} from 'next/navigation';
 import {useState, useEffect} from 'react';
 import {useToast} from "@/hooks/use-toast";
 import {Loader2} from "lucide-react";
-
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,6 +52,7 @@ export default function LoginForm() {
                 })
             }, 1500);
         }
+        setLocalStorageCredentials({email, token: data.token});
       } else {
         console.error('Authentication failed', data);
           toast({
