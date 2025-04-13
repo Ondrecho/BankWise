@@ -37,11 +37,16 @@ export default function ClientDashboard() {
       try {
         const response = await fetch('/api/user/profile');
         if (response.ok) {
-          const data = await response.json();
-          setProfile(data);
-          // Initialize the updated states with the current profile values
-          setUpdatedFullName(data.fullName);
-          setUpdatedEmail(data.email);
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            setProfile(data);
+            // Initialize the updated states with the current profile values
+            setUpdatedFullName(data.fullName);
+            setUpdatedEmail(data.email);
+          } else {
+            console.error("Response is not JSON");
+          }
         } else {
           console.error('Failed to fetch profile');
         }
