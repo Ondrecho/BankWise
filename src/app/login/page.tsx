@@ -61,16 +61,6 @@ export default function LoginForm() {
     }
   };
 
-    const handleLogout = () => {
-        // Implement logout logic here, such as clearing tokens or session data
-        // For now, just redirect to the home page
-        router.push('/');
-        toast({
-            title: "Logged out",
-            description: "You have been successfully logged out.",
-        })
-    };
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <h1 className="text-3xl font-bold mb-4">Login</h1>
@@ -92,9 +82,6 @@ export default function LoginForm() {
       <Button variant="link" onClick={() => router.push('/register')}>
         Sign Up
       </Button>
-        <Button variant="secondary" onClick={handleLogout}>
-            Logout
-        </Button>
     </div>
   );
 }

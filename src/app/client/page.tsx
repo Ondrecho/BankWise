@@ -308,6 +308,16 @@ export default function ClientDashboard() {
     alert(`Transaction type ${type} for account ${accountId}`);
   };
 
+    const handleLogout = () => {
+        // Implement logout logic here, such as clearing tokens or session data
+        // For now, just redirect to the home page
+        router.push('/');
+        toast({
+            title: "Logged out",
+            description: "You have been successfully logged out.",
+        })
+    };
+
   const activeAccounts = accounts.filter(account => account.status === 'ACTIVE');
   const closedAccounts = accounts.filter(account => account.status === 'CLOSED');
 
@@ -409,6 +419,9 @@ export default function ClientDashboard() {
                 </AlertDialogContent>
               </AlertDialog>
               </div>
+                <Button variant="secondary" onClick={handleLogout}>
+                    Logout
+                </Button>
             </CardContent>
           </Card>
         </TabsContent>
