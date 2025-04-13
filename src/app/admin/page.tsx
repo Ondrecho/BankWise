@@ -1,6 +1,5 @@
 'use client';
-
-import {Button} from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -8,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -26,8 +25,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {useToast} from '@/hooks/use-toast';
-import {useState, useEffect} from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,21 +38,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Legend,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
 } from 'recharts';
-import {useRouter} from "next/navigation";
-import {
-  getUsers, createUser, updateUser, deleteUser, getRoles, createRole, updateRole, deleteRole, getUserAccounts,
-  User, Role, Account, generateLogs, checkLogStatus, getPageVisitCount, getOverallStatistics
+import { useRouter } from "next/navigation";
+import { 
+  getUsers, createUser, updateUser, deleteUser, getRoles, createRole, updateRole, deleteRole, getUserAccounts, closeAccount,
+  User, Role, Account, generateLogs, checkLogStatus, getPageVisitCount, getOverallStatistics, createAccount, deleteAccount, openAccount
 } from "@/services/bankwise-backend";
 
 export default function AdminDashboard() {
@@ -65,7 +64,7 @@ export default function AdminDashboard() {
     password: '',
     role: 'ROLE_USER',
   });
-  const {toast} = useToast();
+  const { toast } = useToast();
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editedFullName, setEditedFullName] = useState('');
   const [editedEmail, setEditedEmail] = useState('');
@@ -74,52 +73,48 @@ export default function AdminDashboard() {
   const [selectedUserId, setSelectedUserId] = useState<User | null>(null);
   const [userAccounts, setUserAccounts] = useState<Account[]>([]);
   const [newAccountCurrency, setNewAccountCurrency] = useState("EUR");
-
   const [roles, setRoles] = useState<Role[]>([]);
   const [newRoleName, setNewRoleName] = useState('');
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [editedRoleName, setEditedRoleName] = useState('');
-
   // Logs Management
   const [logDate, setLogDate] = useState('');
   const [taskId, setTaskId] = useState('');
   const [logStatus, setLogStatus] = useState('');
   const [downloadLink, setDownloadLink] = useState('');
-
   const [pageStats, setPageStats] = useState<{ [key: string]: number }>({});
   const [pageVisitCount, setPageVisitCount] = useState(0);
   const [pageUrl, setPageUrl] = useState("/dashboard"); // Default URL
+  // User Filtering
+  const [fullNameFilter, setFullNameFilter] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const router = useRouter();
 
-    // User Filtering
-    const [fullNameFilter, setFullNameFilter] = useState('');
-    const [roleFilter, setRoleFilter] = useState('');
+  const loadUsers = async () => {
+    console.log("loadUsers called");
+    try {
+      const fetchedUsers = await getUsers(fullNameFilter, roleFilter);
+      setUsers(fetchedUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast({
+        title: "Error fetching users!",
+      });
+    }
+  };
 
-    const router = useRouter();
-
-    const loadUsers = async () => {
-        console.log("loadUsers called");
-        try {
-            const fetchedUsers = await getUsers(fullNameFilter, roleFilter);
-            setUsers(fetchedUsers);
-        } catch (error) {
-            console.error("Error fetching users:", error);
-            toast({
-                title: "Error fetching users!",
-            });
-        }
-    };
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setNewUser({...newUser, [event.target.name]: event.target.value});
-  }
+    setNewUser({ ...newUser, [event.target.name]: event.target.value });
+  };
 
   // User Management Handlers
   const handleCreateUser = async () => {
     try {
       const createdUser = await createUser(newUser);
       setUsers([...users, createdUser]);
-      setNewUser({fullName: '', email: '', dateOfBirth: '', password: '', role: 'ROLE_USER'}); // Reset form
+      setNewUser({ fullName: '', email: '', dateOfBirth: '', password: '', role: 'ROLE_USER' }); // Reset form
       toast({
         title: 'User created successfully!',
         description: `A new user with email ${createdUser.email} has been created.`,
@@ -135,29 +130,28 @@ export default function AdminDashboard() {
     console.log("User created");
   };
 
-    const handleDeleteUser = async (userId: number) => {
-        if (typeof userId !== 'number') {
-            console.error('Invalid userId:', userId);
-            toast({
-                title: 'Invalid User ID',
-                description: 'The provided User ID is not valid.',
-                variant: 'destructive',
-            });
-            return;
-        }
-
-        try {
-            await deleteUser(userId);
-            setUsers(users.filter((user) => user.id !== userId));
-            toast({
-                title: 'User Deleted',
-                description: `User with ID ${userId} has been successfully deleted.`,
-            });
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            toast({ title: 'Failed to delete user!', description: 'Please try again.', variant: 'destructive' });
-        }
-    };
+  const handleDeleteUser = async (userId: number) => {
+    if (typeof userId !== 'number') {
+      console.error('Invalid userId:', userId);
+      toast({
+        title: 'Invalid User ID',
+        description: 'The provided User ID is not valid.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    try {
+      await deleteUser(userId);
+      setUsers(users.filter((user) => user.id !== userId));
+      toast({
+        title: 'User Deleted',
+        description: `User with ID ${userId} has been successfully deleted.`,
+      });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({ title: 'Failed to delete user!', description: 'Please try again.', variant: 'destructive' });
+    }
+  };
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
@@ -169,7 +163,6 @@ export default function AdminDashboard() {
 
   const handleUpdateUser = async () => {
     if (!editingUser) return;
-
     const updatedUser = {
       ...editingUser,
       fullName: editedFullName,
@@ -181,47 +174,80 @@ export default function AdminDashboard() {
       const result = await updateUser(updatedUser);
       setUsers(users.map((user) => (user.id === editingUser.id ? result : user)));
       setEditingUser(null);
-      toast({title: 'User updated successfully!', description: `User with ID ${result.id} has been updated.`});
+      toast({ title: 'User updated successfully!', description: `User with ID ${result.id} has been updated.` });
     } catch (error) {
       console.error('Failed to update user:', error);
-      toast({title: 'Failed to update user!', description: 'Please try again.', variant: 'destructive'});
+      toast({ title: 'Failed to update user!', description: 'Please try again.', variant: 'destructive' });
     }
     console.log("User updated");
   };
 
   const handleViewAccounts = async (user: User) => {
-      setSelectedUserId(user);
-      try {
-          const accounts = await getUserAccounts(user.id);
-          setUserAccounts(accounts);
-          toast({title: 'Accounts loaded successfully!', description: `Accounts for ${user.fullName} loaded.`});
-
-      } catch (error: any) {
-          setUserAccounts([]);
-          // Keep selectedUserId so the section doesn't disappear
-          console.error('Failed to fetch user accounts:', error);
+    setSelectedUserId(user);
+    try {
+      const accounts = await getUserAccounts(user.id);
+      setUserAccounts(accounts);
+      toast({ title: 'Accounts loaded successfully!', description: `Accounts for ${user.fullName} loaded.` });
+    } catch (error: any) {
+      setUserAccounts([]);
+      // Keep selectedUserId so the section doesn't disappear
+      console.error('Failed to fetch user accounts:', error);
       toast({
         title: 'Failed to fetch accounts!',
-          description: 'Could not retrieve accounts for this user.',
-          variant: 'destructive',
+        description: 'Could not retrieve accounts for this user.',
+        variant: 'destructive',
       });
     }
   };
 
   const handleCreateAccount = async () => {
-    // Implement the real server request here
-    // Example: await deleteAccount(iban);
-    toast({
-      title: "Account deletion not implemented!",
-      description: "This feature is not yet implemented.",
-    });
-  }
+    if (!selectedUserId) {
+      toast({
+        title: "No user selected!",
+        description: "Please select a user first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      const newAccount = await createAccount(selectedUserId.id, { currency: newAccountCurrency });
+      setUserAccounts([...userAccounts, newAccount]);
+      toast({
+        title: "Account created!",
+        description: `A new account with currency ${newAccountCurrency} has been created.`,
+      });
+    } catch (error: any) {
+      toast({ title: "Failed to create account!", description: error.message, variant: "destructive" });
+    }
+  };
 
-  // Role Management Handlers
-  const handleCreateRole = async () => {
+  const handleCloseAccount = async (iban: string) => {
+    try {
+      await closeAccount(iban);
+      setUserAccounts(prevAccounts =>
+        prevAccounts.map(account =>
+          account.iban === iban ? { ...account, status: "CLOSED" } : account
+        )
+      );
+      toast({
+        title: "Account closed!",
+        description: `Account with IBAN ${iban} has been closed.`,
+      });
+    } catch (error: any) {
+      console.error("Failed to close account:", error);
+      toast({
+        title: "Failed to close account!",
+        description: error.message,
+        variant: "destructive",
+      });
+    };
+  };
+
+    // Role Management Handlers
+    const handleCreateRole = async () => {
     try {
       const createdRole = await createRole({ name: newRoleName }); // Assuming createRole takes a Role object
-          setRoles([...roles, createdRole]);
+      setRoles([...roles, createdRole]);
       setNewRoleName(''); // Reset input
       toast({
         title: 'Role created successfully!',
@@ -234,25 +260,25 @@ export default function AdminDashboard() {
         description: 'Please check the provided information and try again.',
         variant: 'destructive',
       });
-    }    
+    }
   };
 
   const handleDeleteRole = async (roleId: number) => {
-      try {
-          await deleteRole(roleId);
-          setRoles(roles.filter((role) => role.id !== roleId));
-          toast({
-              title: 'Role deleted successfully!',
-              description: `Role with ID ${roleId} has been deleted.`,
-          });
-      } catch (error) {
-          console.error('Failed to delete role:', error);
-          toast({
-              title: 'Failed to delete role!',
-              description: 'Please try again.',
-              variant: 'destructive',
-          });
-      }    
+    try {
+      await deleteRole(roleId);
+      setRoles(roles.filter((role) => role.id !== roleId));
+      toast({
+        title: 'Role deleted successfully!',
+        description: `Role with ID ${roleId} has been deleted.`,
+      });
+    } catch (error) {
+      console.error('Failed to delete role:', error);
+      toast({
+        title: 'Failed to create role!',
+        description: 'Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleEditRole = (role: Role) => {
@@ -262,8 +288,7 @@ export default function AdminDashboard() {
 
   const handleUpdateRole = async () => {
     if (!editingRole) return;
-
-      try {
+    try {
       const updatedRole = await updateRole({ ...editingRole, name: editedRoleName }); // Assuming updateRole takes a Role object
       if (updatedRole) {
         setRoles(
@@ -280,10 +305,10 @@ export default function AdminDashboard() {
           description: 'Role not found or update failed.',
           variant: 'destructive',
         });
-      }      
+      }
     } catch (error) {
       console.error('Failed to update role:', error);
-      toast({title: 'Failed to update role!', description: 'Please try again.', variant: 'destructive'});
+      toast({ title: 'Failed to update role!', description: 'Please try again.', variant: 'destructive' });
     }
   };
 
@@ -295,7 +320,7 @@ export default function AdminDashboard() {
       title: "Log generation not implemented!",
       description: "This feature is not yet implemented.",
     });
-  }
+  };
 
   const handleCheckStatus = async () => {};
 
@@ -312,14 +337,13 @@ export default function AdminDashboard() {
       console.error('Failed to fetch page visit count:', error);
       toast({ title: 'Failed to fetch visit count!', description: 'Please try again.', variant: 'destructive' });
     }
-  }
-  
+  };
+
   const renderBarChart = (data: { [key: string]: number }) => {
     const chartData = Object.entries(data).map(([url, count]) => ({
       url,
       visits: count,
     }));
-
     return (
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData}>
@@ -332,24 +356,45 @@ export default function AdminDashboard() {
         </BarChart>
       </ResponsiveContainer>
     );
-  }
+  };
 
   const handleLogout = async () => {
-      localStorage.removeItem('credentials'); // Clear credentials from local storage
-      router.push('/login'); // Redirect to the login page
-      toast({
-          title: "Logged out",
-          description: "You have been successfully logged out.",
-      });
+    localStorage.removeItem('credentials'); // Clear credentials from local storage
+    router.push('/login'); // Redirect to the login page
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
   };
-  
+
+    const handleOpenAccount = async (iban: string) => {
+        try {
+            await openAccount(iban);
+            setUserAccounts(prevAccounts =>
+                prevAccounts.map(account =>
+                    account.iban === iban ? { ...account, status: "ACTIVE" } : account
+                )
+            );
+            toast({
+                title: "Account opened!",
+                description: `Account with IBAN ${iban} has been opened.`,
+            });
+        } catch (error: any) {
+            console.error("Failed to open account:", error);
+            toast({
+                title: "Failed to open account!",
+                description: error.message,
+                variant: "destructive",
+            });
+        }
+    };
+
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
-        <Button variant="secondary" onClick={handleLogout} className="self-end mr-4">
-            Logout
-        </Button>
-
+      <Button variant="secondary" onClick={handleLogout} className="self-end mr-4">
+        Logout
+      </Button>
       <Tabs defaultValue="users" className="w-full max-w-5xl">
         <TabsList>
           <TabsTrigger value="users">User Management</TabsTrigger>
@@ -365,7 +410,6 @@ export default function AdminDashboard() {
                 Manage users, their roles, and accounts.
               </CardDescription>
             </CardHeader>
-
             <CardContent className="grid gap-4">
               {/* Filtering Options */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -392,7 +436,6 @@ export default function AdminDashboard() {
                   </Select>
                 </div>
               </div>
-
               <h2 className="text-xl font-semibold mb-2">Create New User</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -437,7 +480,7 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <Label htmlFor="role">Role</Label>
-                  <Select name="role" onValueChange={(value) => handleInputChange({target: {name: 'role', value} } as any)}>
+                  <Select name="role" onValueChange={(value) => handleInputChange({ target: { name: 'role', value } } as any)}>
                     <SelectTrigger id="role">
                       <SelectValue placeholder="Select Role" />
                     </SelectTrigger>
@@ -449,9 +492,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <Button onClick={handleCreateUser}>Create User</Button>
-              
               <Button onClick={loadUsers} className="mt-4">Load Users</Button>
-
               <h2 className="text-xl font-semibold mt-4 mb-2">Existing Users</h2>
               <Table>
                 <TableCaption>A list of existing users in the system.</TableCaption>
@@ -494,7 +535,6 @@ export default function AdminDashboard() {
                             View Accounts
                           </Button>
                         )}
-
                       </TableCell>
                     </TableRow>
                   ))}
@@ -536,7 +576,7 @@ export default function AdminDashboard() {
                       <Select value={editedRole} onValueChange={(value) => setEditedRole(value)}>
                         <SelectTrigger id="editRole">
                           <SelectValue placeholder="Select Role" />
-                      </SelectTrigger>
+                        </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="ROLE_USER">User</SelectItem>
                           <SelectItem value="ROLE_ADMIN">Admin</SelectItem>
@@ -551,13 +591,11 @@ export default function AdminDashboard() {
               )}
             </CardContent>
           </Card>
-
-
           {/* User Account Management Section */}
           {selectedUserId && (
-              <Card className="w-full max-w-4xl mt-4">
+            <Card className="w-full max-w-4xl mt-4">
               <CardHeader>
-                  <CardTitle>Account Management for {selectedUserId.fullName}</CardTitle>
+                <CardTitle>Account Management for {selectedUserId.fullName}</CardTitle>
                 <CardDescription>
                   Manage {selectedUserId.fullName}'s accounts.
                 </CardDescription>
@@ -578,7 +616,6 @@ export default function AdminDashboard() {
                   </Select>
                   <Button onClick={handleCreateAccount}>Create New Account</Button>
                 </div>
-
                 <Table>
                   <TableCaption>A list of existing accounts for {selectedUserId.fullName}.</TableCaption>
                   <TableHeader>
@@ -598,13 +635,14 @@ export default function AdminDashboard() {
                         <TableCell>{account.currency}</TableCell>
                         <TableCell>{account.status}</TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteAccount(account.iban)}
-                          >
-                            Delete
-                          </Button>
+                          {account.status === "CLOSED" ? (
+                            <>
+                              <Button variant="outline" size="sm" onClick={() => handleOpenAccount(account.iban)}>Open</Button>
+                              <Button variant="destructive" size="sm" onClick={() => deleteAccount(account.iban)}>Delete</Button>
+                            </>
+                          ) : ( // Changed this line
+                            <Button variant="secondary" size="sm" onClick={() => handleCloseAccount(account.iban)}>Close</Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -614,7 +652,6 @@ export default function AdminDashboard() {
             </Card>
           )}
         </TabsContent>
-
         <TabsContent value="roles">
           <Card className="w-full">
             <CardHeader>
@@ -636,7 +673,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <Button onClick={handleCreateRole}>Create Role</Button>
-
               <h2 className="text-xl font-semibold mt-4 mb-2">Existing Roles</h2>
               <Table>
                 <TableCaption>A list of existing roles in the system.</TableCaption>
@@ -692,7 +728,6 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="logs">
           <Card className="w-full">
             <CardHeader>
@@ -713,19 +748,16 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <Button onClick={handleGenerateLogs}>Generate Logs</Button>
-
               {taskId && (
                 <div className="mt-4">
                   <h3 className="text-lg font-semibold mb-2">Log Generation Status</h3>
                   <p>Task ID: {taskId}</p>
                   <p>Status: {logStatus || 'Pending...'}</p>
-
                   {logStatus !== 'COMPLETED' && (
                     <Button variant="secondary" onClick={handleCheckStatus}>
                       Check Status
                     </Button>
                   )}
-
                   {downloadLink && (
                     <a href={downloadLink} download className="block mt-2">
                       <Button>Download Logs</Button>
@@ -736,7 +768,6 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="stats">
           <Card className="w-full">
             <CardHeader>
@@ -764,7 +795,6 @@ export default function AdminDashboard() {
                   <p>Page {pageUrl} has {pageVisitCount} visits.</p>
                 </div>
               )}
-
               <h2 className="text-xl font-semibold mt-4 mb-2">Overall Statistics</h2>
               {renderBarChart(pageStats)}
             </CardContent>
@@ -774,4 +804,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-

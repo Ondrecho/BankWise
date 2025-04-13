@@ -46,6 +46,8 @@ export async function authenticate(credentials: any): Promise<any> {
   return data;
 }
 
+const credentials = {token: "eyJhbGciOiJIUzI1NiJ9.eyJpc0FkbWluIjp0cnVlLCJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc0NDU2MTE5NCwiZXhwIjoyNzQ0NTYxMTk0fQ.9kyYeryvDEJNIr7uBrgTrbkyG3-YbOcwbspZ1RgGXxM", email: "admin@bank.com"};
+
 export interface Role {
   id: number;
   name: string;
@@ -72,7 +74,6 @@ export async function getUsers(fullName?: string, roleName?: string, ): Promise<
     url += `?${params.toString()}`;
   }
 
-  const credentials = {token: "eyJhbGciOiJIUzI1NiJ9.eyJpc0FkbWluIjp0cnVlLCJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc0NDU2MTE5NCwiZXhwIjoyNzQ0NTYxMTk0fQ.9kyYeryvDEJNIr7uBrgTrbkyG3-YbOcwbspZ1RgGXxM", email: "admin@bank.com"};
   console.log('Constructed URL:', url);
   console.log('Request Headers:', { 'Authorization': `Bearer ${credentials.token}` });
   const response = await fetch(url, {
@@ -106,7 +107,6 @@ export async function updateUser(userId: number, userData: any): Promise<User> {
 }
 
 export async function deleteUser(userId: number): Promise<any> {
-  const credentials = {token: "eyJhbGciOiJIUzI1NiJ9.eyJpc0FkbWluIjp0cnVlLCJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc0NDU2MTE5NCwiZXhwIjoyNzQ0NTYxMTk0fQ.9kyYeryvDEJNIr7uBrgTrbkyG3-YbOcwbspZ1RgGXxM", email: "admin@bank.com"};
   const url = `http://localhost:8080/api/admin/users/${userId}`;
 
   const response = await fetch(url, {
@@ -144,7 +144,6 @@ export async function deleteRole(roleId: number): Promise<void> {
 }
 
 export async function getUserAccounts(userId: number ): Promise<Account[]> {
-  const credentials = {token: "eyJhbGciOiJIUzI1NiJ9.eyJpc0FkbWluIjp0cnVlLCJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc0NDU2MTE5NCwiZXhwIjoyNzQ0NTYxMTk0fQ.9kyYeryvDEJNIr7uBrgTrbkyG3-YbOcwbspZ1RgGXxM", email: "admin@bank.com"};
   const url = `http://localhost:8080/api/admin/users/${userId}/accounts`;
 
   console.log('Constructed URL:', url);
@@ -165,5 +164,53 @@ export async function getUserAccounts(userId: number ): Promise<Account[]> {
     throw new Error(`Failed to fetch user accounts: ${response.statusText}`);
   }
   return JSON.parse(responseBody) as Account[];
+}
+
+export async function closeAccount(iban: string): Promise<Response> {
+  const url = `http://localhost:8080/api/accounts/${iban}/close`;
+  console.log('Constructed URL:', url);
+  console.log('Request Headers:', { Authorization: `Bearer ${credentials.token}` });
+
+  const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+          'Authorization': `Bearer ${credentials.token}`,
+      },
+  });
+
+  if (!response.ok) {
+      throw new Error(`Failed to close account: ${response.statusText}`);
+  }
+  return response;
+}
+
+export async function openAccount(iban: string): Promise<Response> {
+  const url = `http://localhost:8080/api/accounts/${iban}/open`;
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${credentials.token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to open account: ${response.statusText}`);
+  }
+  return response;
+}
+
+export async function deleteAccount(iban: string): Promise<Response> {
+  const url = `http://localhost:8080/api/accounts/${iban}`;
+  const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+          'Authorization': `Bearer ${credentials.token}`,
+      },
+  });
+
+  if (!response.ok) {
+      throw new Error(`Failed to delete account: ${response.statusText}`);
+  }
+  return response;
 }
 
