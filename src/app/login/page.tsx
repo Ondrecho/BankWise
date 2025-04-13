@@ -2,31 +2,74 @@
 
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
-import {authenticate} from '@/services/bankwise-backend';
 import {useRouter} from 'next/navigation';
 import {useState} from 'react';
+import {useToast} from "@/hooks/use-toast";
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+    const {toast} = useToast();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      const data = await authenticate({email, password});
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
 
-      // Check if data and isAdmin property exists
-      if (data && data.isAdmin) {
-        router.push('/admin');
+      const data = await response.json();
+
+      if (response.ok) {
+        // Check if data and isAdmin property exists
+        if (data && data.admin) {
+          router.push('/admin');
+            toast({
+                title: "Login successful",
+                description: "Redirecting to admin dashboard...",
+            })
+        } else {
+          router.push('/client');
+            toast({
+                title: "Login successful",
+                description: "Redirecting to client dashboard...",
+            })
+        }
       } else {
-        router.push('/client');
+        console.error('Authentication failed', data);
+          toast({
+              variant: "destructive",
+              title: "Login failed",
+              description: data.message || "Invalid credentials.",
+          })
       }
     } catch (error) {
       console.error('Authentication failed', error);
-      alert('Authentication failed');
+        toast({
+            variant: "destructive",
+            title: "Login failed",
+            description: "An error occurred while logging in.",
+        })
     }
   };
+
+    const handleLogout = () => {
+        // Implement logout logic here, such as clearing tokens or session data
+        // For now, just redirect to the home page
+        router.push('/');
+        toast({
+            title: "Logged out",
+            description: "You have been successfully logged out.",
+        })
+    };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
@@ -49,6 +92,9 @@ export default function LoginForm() {
       <Button variant="link" onClick={() => router.push('/register')}>
         Sign Up
       </Button>
+        <Button variant="secondary" onClick={handleLogout}>
+            Logout
+        </Button>
     </div>
   );
 }

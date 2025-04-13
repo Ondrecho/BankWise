@@ -37,6 +37,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import React from "react"; // Import React
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 
 const profileFormSchema = z.object({
@@ -69,6 +70,7 @@ export default function ClientDashboard() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const {toast} = useToast();
   const [open, setOpen] = React.useState(false)
+  const [newAccountCurrency, setNewAccountCurrency] = useState("EUR"); // Default currency
 
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
@@ -201,7 +203,7 @@ export default function ClientDashboard() {
 
   const handleCreateAccount = async () => {
     try {
-      const response = await fetch('/api/user/accounts?currency=EUR', {
+      const response = await fetch(`/api/user/accounts?currency=${newAccountCurrency}`, {
         method: 'POST',
       });
 
@@ -397,7 +399,22 @@ export default function ClientDashboard() {
               <CardTitle>Accounts</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button onClick={handleCreateAccount}>Create New Account</Button>
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="currency">Currency:</Label>
+                <Select onValueChange={setNewAccountCurrency} defaultValue={newAccountCurrency}>
+                  <SelectTrigger id="currency">
+                    <SelectValue placeholder={newAccountCurrency} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="BYR">BYR</SelectItem>
+                    <SelectItem value="RUB">RUB</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleCreateAccount}>Create New Account</Button>
+              </div>
+
               <Separator className="my-2"/>
               {activeAccounts.length > 0 && (
                 <>
