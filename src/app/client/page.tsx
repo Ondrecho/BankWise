@@ -68,13 +68,18 @@ export default function ClientDashboard() {
   const {toast} = useToast();
   const [open, setOpen] = React.useState(false)
   const [newAccountCurrency, setNewAccountCurrency] = useState("EUR"); // Default currency
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedFullName, setUpdatedFullName] = useState('');
+  const [updatedEmail, setUpdatedEmail] = useState('');
+  const [updatedDateOfBirth, setUpdatedDateOfBirth] = useState('');
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      fullName: profile.fullName,
-      email: profile.email,
-      dateOfBirth: profile.dateOfBirth,
+      fullName: '',
+      email: '',
+      dateOfBirth: '',
     },
   })
 
@@ -133,8 +138,18 @@ export default function ClientDashboard() {
       try {
         const response = await fetch('/api/user/accounts');
         if (response.ok) {
-          const data = await response.json();
-          setAccounts(data);
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            setAccounts(data);
+          } else {
+            console.error('Failed to fetch accounts - Response is not JSON');
+            toast({
+              variant: "destructive",
+              title: "Failed to fetch accounts",
+              description: "The response is not in JSON format."
+            })
+          }
         } else {
           console.error('Failed to fetch accounts');
           toast({
@@ -495,3 +510,4 @@ export default function ClientDashboard() {
     </div>
   );
 }
+
