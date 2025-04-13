@@ -36,6 +36,8 @@ import { Switch } from "@/components/ui/switch"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import React from "react"; // Import React
+
 
 const profileFormSchema = z.object({
   fullName: z.string().min(2, {
@@ -64,7 +66,6 @@ export default function ClientDashboard() {
   const [updatedFullName, setUpdatedFullName] = useState('');
   const [updatedEmail, setUpdatedEmail] = useState('');
   const [updatedDateOfBirth, setUpdatedDateOfBirth] = useState('');
-  const [updatedPassword, setUpdatedPassword] = useState('');
   const [date, setDate] = useState<Date | undefined>(new Date());
   const {toast} = useToast();
   const [open, setOpen] = React.useState(false)
@@ -77,12 +78,6 @@ export default function ClientDashboard() {
       dateOfBirth: profile.dateOfBirth,
     },
   })
-
-  useEffect(() => {
-    form.setValue("fullName", profile.fullName);
-    form.setValue("email", profile.email);
-    form.setValue("dateOfBirth", profile.dateOfBirth);
-  }, [profile, form.setValue]);
 
   useEffect(() => {
     const fetchProfile = async () => {
