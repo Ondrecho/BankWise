@@ -32,9 +32,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Switch } from "@/components/ui/switch"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import {Switch} from "@/components/ui/switch"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
 import React from "react"; // Import React
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useRouter} from "next/navigation";
@@ -68,11 +68,6 @@ export default function ClientDashboard() {
   const {toast} = useToast();
   const [open, setOpen] = React.useState(false)
   const [newAccountCurrency, setNewAccountCurrency] = useState("EUR"); // Default currency
-  const [isEditing, setIsEditing] = useState(false);
-  const [updatedFullName, setUpdatedFullName] = useState('');
-  const [updatedEmail, setUpdatedEmail] = useState('');
-  const [updatedDateOfBirth, setUpdatedDateOfBirth] = useState('');
-  const [date, setDate] = useState<Date | undefined>(new Date());
 
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
@@ -113,12 +108,14 @@ export default function ClientDashboard() {
             })
           }
         } else {
-          console.error('Failed to fetch profile');
-          toast({
-            variant: "destructive",
-            title: "Failed to fetch profile",
-            description: "There was an error fetching your profile data."
-          })
+          console.warn('Failed to fetch profile');
+          if (response.status !== 404) {
+            toast({
+              variant: "destructive",
+              title: "Failed to fetch profile",
+              description: "There was an error fetching your profile data."
+            })
+          }
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -131,7 +128,7 @@ export default function ClientDashboard() {
     };
 
     fetchProfile();
-  }, [form]);
+  }, [form, toast]);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -169,7 +166,7 @@ export default function ClientDashboard() {
     };
 
     fetchAccounts();
-  }, []);
+  }, [toast]);
 
   const handleUpdateProfile = async (values: z.infer<typeof profileFormSchema>) => {
     try {
@@ -510,4 +507,3 @@ export default function ClientDashboard() {
     </div>
   );
 }
-
