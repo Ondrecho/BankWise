@@ -40,6 +40,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Legend,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis
+} from "recharts";
 
 interface User {
   id: number;
@@ -105,6 +115,15 @@ export default function AdminDashboard() {
   const [logStatus, setLogStatus] = useState('');
   const [downloadLink, setDownloadLink] = useState('');
 
+  // Stats Management
+  const [pageStats, setPageStats] = useState({
+    "/dashboard": 150,
+    "/profile": 80,
+    "/transactions": 45
+  });
+  const [pageVisitCount, setPageVisitCount] = useState(0);
+  const [pageUrl, setPageUrl] = useState("/dashboard"); // Default URL
+
   useEffect(() => {
     // Mock API call to fetch users
     const fetchUsers = async () => {
@@ -143,6 +162,19 @@ export default function AdminDashboard() {
     };
 
     fetchRoles();
+
+    // Mock API call to fetch statistics
+    const fetchStats = async () => {
+      // Simulate API response
+      const mockedStats = {
+        "/dashboard": 150,
+        "/profile": 80,
+        "/transactions": 45
+      };
+      setPageStats(mockedStats);
+    };
+
+    fetchStats();
   }, []);
 
   const handleInputChange = (
@@ -368,6 +400,38 @@ export default function AdminDashboard() {
     }
   };
 
+  // Stats Management Handlers
+  const handleGetPageVisitCount = async () => {
+    // Mock API call to get page visit count
+    const mockedCount = Math.floor(Math.random() * 200);
+    setPageVisitCount(mockedCount);
+
+    toast({
+      title: 'Page visit count fetched!',
+      description: `Page ${pageUrl} has ${mockedCount} visits.`,
+    });
+  };
+
+  const renderBarChart = (data: { [key: string]: number }) => {
+    const chartData = Object.entries(data).map(([url, count]) => ({
+      url,
+      visits: count,
+    }));
+
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="url" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="visits" fill="#8884d8" />
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  };
+
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
@@ -377,6 +441,7 @@ export default function AdminDashboard() {
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="roles">Role Management</TabsTrigger>
           <TabsTrigger value="logs">Logs Management</TabsTrigger>
+          <TabsTrigger value="stats">Statistics</TabsTrigger>
         </TabsList>
         <TabsContent value="users">
           <Card className="w-full">
@@ -722,6 +787,40 @@ export default function AdminDashboard() {
                   )}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="stats">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Statistics</CardTitle>
+              <CardDescription>View statistics for the application.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <h2 className="text-xl font-semibold mb-2">Page Visit Count</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="pageUrl">Page URL</Label>
+                  <Input
+                    type="text"
+                    id="pageUrl"
+                    name="pageUrl"
+                    value={pageUrl}
+                    onChange={(e) => setPageUrl(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button onClick={handleGetPageVisitCount}>Get Visit Count</Button>
+              {pageVisitCount > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-2">Visit Count</h3>
+                  <p>Page {pageUrl} has {pageVisitCount} visits.</p>
+                </div>
+              )}
+
+              <h2 className="text-xl font-semibold mt-4 mb-2">Overall Statistics</h2>
+              {renderBarChart(pageStats)}
             </CardContent>
           </Card>
         </TabsContent>
