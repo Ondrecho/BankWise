@@ -124,29 +124,47 @@ export default function AdminDashboard() {
   const [pageVisitCount, setPageVisitCount] = useState(0);
   const [pageUrl, setPageUrl] = useState("/dashboard"); // Default URL
 
+    // User Filtering
+    const [fullNameFilter, setFullNameFilter] = useState('');
+    const [roleFilter, setRoleFilter] = useState('');
+
   useEffect(() => {
     // Mock API call to fetch users
     const fetchUsers = async () => {
-      // Simulate API response
-      const mockedUsers = [
-        {
-          id: 1,
-          fullName: 'John Doe',
-          email: 'john.doe@example.com',
-          dateOfBirth: '1990-01-01',
-          roles: [{id: 1, name: 'ROLE_ADMIN'}],
-          accounts: [],
-        },
-        {
-          id: 2,
-          fullName: 'Jane Smith',
-          email: 'jane.smith@example.com',
-          dateOfBirth: '1992-05-10',
-          roles: [{id: 2, name: 'ROLE_USER'}],
-          accounts: [],
-        },
-      ];
-      setUsers(mockedUsers);
+        let filteredUsers = [
+            {
+                id: 1,
+                fullName: 'John Doe',
+                email: 'john.doe@example.com',
+                dateOfBirth: '1990-01-01',
+                roles: [{id: 1, name: 'ROLE_ADMIN'}],
+                accounts: [],
+            },
+            {
+                id: 2,
+                fullName: 'Jane Smith',
+                email: 'jane.smith@example.com',
+                dateOfBirth: '1992-05-10',
+                roles: [{id: 2, name: 'ROLE_USER'}],
+                accounts: [],
+            },
+        ];
+
+        // Apply full name filter
+        if (fullNameFilter) {
+            filteredUsers = filteredUsers.filter(user =>
+                user.fullName.toLowerCase().includes(fullNameFilter.toLowerCase())
+            );
+        }
+
+        // Apply role filter
+        if (roleFilter) {
+            filteredUsers = filteredUsers.filter(user =>
+                user.roles.some(role => role.name === roleFilter)
+            );
+        }
+
+        setUsers(filteredUsers);
     };
 
     fetchUsers();
@@ -175,7 +193,7 @@ export default function AdminDashboard() {
     };
 
     fetchStats();
-  }, []);
+  }, [fullNameFilter, roleFilter]);
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -452,6 +470,33 @@ export default function AdminDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
+              {/* Filtering Options */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="fullNameFilter">Filter by Full Name</Label>
+                  <Input
+                    type="text"
+                    id="fullNameFilter"
+                    name="fullNameFilter"
+                    value={fullNameFilter}
+                    onChange={(e) => setFullNameFilter(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="roleFilter">Filter by Role</Label>
+                  <Select id="roleFilter" value={roleFilter} onValueChange={setRoleFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All Roles</SelectItem>
+                      <SelectItem value="ROLE_USER">User</SelectItem>
+                      <SelectItem value="ROLE_ADMIN">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <h2 className="text-xl font-semibold mb-2">Create New User</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
