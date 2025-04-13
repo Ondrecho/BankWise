@@ -28,6 +28,17 @@ import {
 } from '@/components/ui/table';
 import {useToast} from '@/hooks/use-toast';
 import {useState, useEffect} from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface User {
   id: number;
@@ -70,6 +81,9 @@ export default function AdminDashboard() {
   const [editedEmail, setEditedEmail] = useState('');
   const [editedDateOfBirth, setEditedDateOfBirth] = useState('');
   const [editedRole, setEditedRole] = useState('ROLE_USER');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [userAccounts, setUserAccounts] = useState([]);
+  const [newAccountCurrency, setNewAccountCurrency] = useState("EUR");
 
   useEffect(() => {
     // Mock API call to fetch users
@@ -159,6 +173,73 @@ export default function AdminDashboard() {
       description: `User with ID ${updatedUser.id} has been updated.`,
     });
   };
+
+    const handleViewAccounts = async (user: User) => {
+        setSelectedUser(user);
+
+        // Mock API call to fetch user accounts
+        const mockedAccounts = [
+            {
+                id: 101,
+                iban: 'DE12345678901234567890',
+                balance: 5000,
+                currency: 'EUR',
+                status: 'ACTIVE'
+            },
+            {
+                id: 102,
+                iban: 'US98765432109876543210',
+                balance: 7500,
+                currency: 'USD',
+                status: 'ACTIVE'
+            }
+        ];
+        setUserAccounts(mockedAccounts);
+    };
+
+    const handleCreateAccount = async () => {
+        if (!selectedUser) return;
+
+        // Mock API call to create a new account for the selected user
+        const newAccount = {
+            id: userAccounts.length + 1,
+            iban: 'MockedIBAN' + (userAccounts.length + 1),
+            balance: 0,
+            currency: newAccountCurrency,
+            status: 'ACTIVE'
+        };
+
+        setUserAccounts([...userAccounts, newAccount]);
+        toast({
+            title: "Account created successfully!",
+            description: `A new account with IBAN ${newAccount.iban} has been created for ${selectedUser.fullName}.`
+        });
+    };
+
+    const handleDeleteAccount = async (iban: string) => {
+        // Mock API call to delete an account
+        setUserAccounts(userAccounts.filter(account => account.iban !== iban));
+        toast({
+            title: "Account deleted successfully!",
+            description: `Account with IBAN ${iban} has been deleted.`
+        });
+    };
+
+    const handleGetAccountHolder = async (iban: string) => {
+        // Mock API call to get the account holder
+        const accountHolder = users.find(user => user.id === 1); // Mocked user
+        if (accountHolder) {
+            toast({
+                title: "Account Holder Info",
+                description: `Account ${iban} is held by ${accountHolder.fullName}.`
+            });
+        } else {
+            toast({
+                title: "Account Holder Not Found",
+                description: `No user found for account ${iban}.`
+            });
+        }
+    };
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
@@ -263,6 +344,13 @@ export default function AdminDashboard() {
                     >
                       Delete
                     </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewAccounts(user)}
+                    >
+                      View Accounts
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -319,6 +407,75 @@ export default function AdminDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* User Account Management Section */}
+      {selectedUser && (
+          <Card className="w-full max-w-4xl mt-4">
+              <CardHeader>
+                  <CardTitle>Account Management for {selectedUser.fullName}</CardTitle>
+                  <CardDescription>
+                      Manage {selectedUser.fullName}'s accounts.
+                  </CardDescription>
+              </CardHeader>
+              <CardContent>
+                  <div className="flex items-center space-x-2 mb-4">
+                      <Label htmlFor="currency">Currency:</Label>
+                      <Select onValueChange={setNewAccountCurrency} defaultValue={newAccountCurrency}>
+                          <SelectTrigger id="currency">
+                              <SelectValue placeholder={newAccountCurrency} />
+                          </SelectTrigger>
+                          <SelectContent>
+                              <SelectItem value="USD">USD</SelectItem>
+                              <SelectItem value="BYR">BYR</SelectItem>
+                              <SelectItem value="RUB">RUB</SelectItem>
+                              <SelectItem value="EUR">EUR</SelectItem>
+                          </SelectContent>
+                      </Select>
+                      <Button onClick={handleCreateAccount}>Create New Account</Button>
+                  </div>
+
+                  <Table>
+                      <TableCaption>A list of existing accounts for {selectedUser.fullName}.</TableCaption>
+                      <TableHeader>
+                          <TableRow>
+                              <TableHead>IBAN</TableHead>
+                              <TableHead>Balance</TableHead>
+                              <TableHead>Currency</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                          {userAccounts.map((account) => (
+                              <TableRow key={account.id}>
+                                  <TableCell>{account.iban}</TableCell>
+                                  <TableCell>{account.balance}</TableCell>
+                                  <TableCell>{account.currency}</TableCell>
+                                  <TableCell>{account.status}</TableCell>
+                                  <TableCell className="text-right">
+                                      <Button
+                                          variant="destructive"
+                                          size="sm"
+                                          onClick={() => handleDeleteAccount(account.iban)}
+                                      >
+                                          Delete
+                                      </Button>
+                                      <Button
+                                          variant="secondary"
+                                          size="sm"
+                                          onClick={() => handleGetAccountHolder(account.iban)}
+                                      >
+                                          Get Account Holder
+                                      </Button>
+                                  </TableCell>
+                              </TableRow>
+                          ))}
+                      </TableBody>
+                  </Table>
+              </CardContent>
+          </Card>
+      )}
     </div>
   );
 }
+
