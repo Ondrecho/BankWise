@@ -50,6 +50,7 @@ import {
     XAxis,
     YAxis
 } from "recharts";
+import {useRouter} from "next/navigation";
 
 interface User {
   id: number;
@@ -127,6 +128,8 @@ export default function AdminDashboard() {
     // User Filtering
     const [fullNameFilter, setFullNameFilter] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
+
+  const router = useRouter();
 
   useEffect(() => {
     // Mock API call to fetch users
@@ -450,9 +453,22 @@ export default function AdminDashboard() {
     );
   };
 
+    const handleLogout = () => {
+        // Implement logout logic here, such as clearing tokens or session data
+        // For now, just redirect to the home page
+        router.push('/');
+        toast({
+            title: "Logged out",
+            description: "You have been successfully logged out.",
+        })
+    };
+
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-2">
       <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+        <Button variant="secondary" onClick={handleLogout} className="self-end mr-4">
+            Logout
+        </Button>
 
       <Tabs defaultValue="users" className="w-full max-w-5xl">
         <TabsList>
@@ -872,3 +888,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
