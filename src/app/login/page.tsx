@@ -18,36 +18,8 @@ export default function LoginForm() {
     event.preventDefault();
     setIsLoading(true);
 
-    // Simulate API response for admin@bank.com with "admin" password
-    if (email === 'admin@bank.com' && password === 'admin') {
-      setTimeout(() => {
-        setIsLoading(false);
-        router.push('/admin');
-        toast({
-          title: "Login successful",
-          description: "Redirecting to admin dashboard...",
-        });
-      }, 1500);
-
-      return; // Exit early to prevent the actual API call
-    }
-
-      // Simulate API response for user@bank.com with "user" password
-      if (email === 'user@bank.com' && password === 'user') {
-          setTimeout(() => {
-              setIsLoading(false);
-              router.push('/client');
-              toast({
-                  title: "Login successful",
-                  description: "Redirecting to client dashboard...",
-              });
-          }, 1500);
-
-          return; // Exit early to prevent the actual API call
-      }
-
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +34,7 @@ export default function LoginForm() {
 
       if (response.ok) {
         // Check if data and isAdmin property exists
-        if (data && data.admin) {
+        if (data && data.isAdmin) {
           setTimeout(() => {
             setIsLoading(false);
             router.push('/admin');

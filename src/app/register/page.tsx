@@ -10,15 +10,34 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
-  const router = useRouter();
+    const router = useRouter();
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    // TODO: Implement registration logic here, call the BankWise Backend API.
-    console.log('Registration data:', {email, password, fullName, dateOfBirth});
-    alert('Registration Successful!');
-    router.push('/login'); // Redirect to login after successful registration
-  };
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                    fullName: fullName,
+                    dateOfBirth: dateOfBirth,
+                }),
+            });
+
+            if (response.ok) {
+                router.push('/login'); // Redirect to login after successful registration
+            } else {
+                console.error('Registration failed');
+            }
+        } catch (error) {
+            console.error('Registration failed', error);
+        }
+    };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
