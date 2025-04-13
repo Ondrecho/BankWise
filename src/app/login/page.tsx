@@ -3,27 +3,48 @@
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {useRouter} from 'next/navigation';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {useToast} from "@/hooks/use-toast";
+import {Loader2} from "lucide-react";
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
     const {toast} = useToast();
+    const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setIsLoading(true);
 
-    // Mock API response for admin@bank.com with "admin" password
+    // Simulate API response for admin@bank.com with "admin" password
     if (email === 'admin@bank.com' && password === 'admin') {
-      router.push('/admin');
-      toast({
-        title: "Login successful",
-        description: "Redirecting to admin dashboard...",
-      });
+      setTimeout(() => {
+        setIsLoading(false);
+        router.push('/admin');
+        toast({
+          title: "Login successful",
+          description: "Redirecting to admin dashboard...",
+        });
+      }, 1500);
+
       return; // Exit early to prevent the actual API call
     }
+
+      // Simulate API response for user@bank.com with "user" password
+      if (email === 'user@bank.com' && password === 'user') {
+          setTimeout(() => {
+              setIsLoading(false);
+              router.push('/client');
+              toast({
+                  title: "Login successful",
+                  description: "Redirecting to client dashboard...",
+              });
+          }, 1500);
+
+          return; // Exit early to prevent the actual API call
+      }
 
     try {
       const response = await fetch('/api/auth/login', {
@@ -42,17 +63,23 @@ export default function LoginForm() {
       if (response.ok) {
         // Check if data and isAdmin property exists
         if (data && data.admin) {
-          router.push('/admin');
-            toast({
-                title: "Login successful",
-                description: "Redirecting to admin dashboard...",
-            })
+          setTimeout(() => {
+            setIsLoading(false);
+            router.push('/admin');
+              toast({
+                  title: "Login successful",
+                  description: "Redirecting to admin dashboard...",
+              })
+          }, 1500);
         } else {
-          router.push('/client');
-            toast({
-                title: "Login successful",
-                description: "Redirecting to client dashboard...",
-            })
+            setTimeout(() => {
+                setIsLoading(false);
+                router.push('/client');
+                toast({
+                    title: "Login successful",
+                    description: "Redirecting to client dashboard...",
+                })
+            }, 1500);
         }
       } else {
         console.error('Authentication failed', data);
@@ -61,6 +88,7 @@ export default function LoginForm() {
               title: "Login failed",
               description: data.message || "Invalid credentials.",
           })
+          setIsLoading(false);
       }
     } catch (error) {
       console.error('Authentication failed', error);
@@ -69,33 +97,38 @@ export default function LoginForm() {
             title: "Login failed",
             description: "An error occurred while logging in.",
         })
+        setIsLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <h1 className="text-3xl font-bold mb-4">Login</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
-        <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button type="submit">Log In</Button>
-      </form>
+        {isLoading ? (
+            <div className="flex items-center space-x-2">
+                <Loader2 className="animate-spin"/>
+                <span>Logging in...</span>
+            </div>
+        ) : (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
+                <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <Input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button type="submit">Log In</Button>
+            </form>
+        )}
       <Button variant="link" onClick={() => router.push('/register')}>
         Sign Up
       </Button>
     </div>
   );
 }
-
-
-    
