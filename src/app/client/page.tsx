@@ -3,7 +3,9 @@
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
 
 export default function ClientDashboard() {
   const [accounts, setAccounts] = useState([
@@ -17,13 +19,70 @@ export default function ClientDashboard() {
   ]);
 
   const [profile, setProfile] = useState({
-    fullName: 'John Doe',
-    email: 'john.doe@example.com',
-    dateOfBirth: '1990-01-01',
+    id: 0,
+    fullName: '',
+    email: '',
+    dateOfBirth: '',
+    roles: [],
+    accounts: [],
   });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedFullName, setUpdatedFullName] = useState('');
+  const [updatedEmail, setUpdatedEmail] = useState('');
+
+  useEffect(() => {
+    // Fetch user profile data from the API
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch('/api/user/profile');
+        if (response.ok) {
+          const data = await response.json();
+          setProfile(data);
+          // Initialize the updated states with the current profile values
+          setUpdatedFullName(data.fullName);
+          setUpdatedEmail(data.email);
+        } else {
+          console.error('Failed to fetch profile');
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleTransaction = (accountId: string, type: string) => {
     alert(`Transaction type ${type} for account ${accountId}`);
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: updatedFullName,
+          email: updatedEmail,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data);
+        setIsEditing(false);
+        alert('Profile updated successfully!');
+      } else {
+        console.error('Failed to update profile');
+        alert('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Error updating profile: ' + error);
+    }
   };
 
   return (
@@ -35,7 +94,7 @@ export default function ClientDashboard() {
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="accounts">Accounts</TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>
-          <TabsTrigger value="update">Update Data</TabsTrigger>
+          {/*<TabsTrigger value="update">Update Data</TabsTrigger>*/}
         </TabsList>
         <TabsContent value="profile" className="mt-4">
           <Card>
@@ -43,9 +102,46 @@ export default function ClientDashboard() {
               <CardTitle>Profile Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Full Name: {profile.fullName}</p>
-              <p>Email: {profile.email}</p>
-              <p>Date of Birth: {profile.dateOfBirth}</p>
+              {!isEditing ? (
+                <>
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <p>Full Name: {profile.fullName}</p>
+                      <p>Email: {profile.email}</p>
+                      <p>Date of Birth: {profile.dateOfBirth}</p>
+                    </div>
+                    <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="grid gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        value={updatedFullName}
+                        onChange={(e) => setUpdatedFullName(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={updatedEmail}
+                        onChange={(e) => setUpdatedEmail(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button variant="secondary" onClick={() => setIsEditing(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleUpdateProfile}>Update Profile</Button>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -92,16 +188,6 @@ export default function ClientDashboard() {
                   </li>
                 ))}
               </ul>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="update" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Update User Data</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Placeholder for user data update form.</p>
             </CardContent>
           </Card>
         </TabsContent>
