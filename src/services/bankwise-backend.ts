@@ -27,12 +27,14 @@ export interface User {
  * @param credentials An object containing the username/email and password for authentication.
  * @returns A promise that resolves to a User object upon successful authentication.
  */
-export async function authenticate(credentials: any): Promise<User> {
+export async function authenticate(credentials: any): Promise<any> {
   // TODO: Implement this by calling the BankWise Backend API.
+  // This is a placeholder, replace with actual API call.
+  console.log('Attempting to authenticate with:', credentials);
 
+  // Simulate API response with JWT token and isAdmin flag.
   return {
-    username: 'testuser',
-    email: 'test@example.com',
-    role: 'client',
+    token: 'fake_jwt_token',
+    isAdmin: credentials.email === 'admin@example.com', // Example condition
   };
 }
