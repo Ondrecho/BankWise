@@ -35,9 +35,9 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
 import React from "react"; // Import React
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {useRouter} from "next/navigation";
 
 
 const profileFormSchema = z.object({
@@ -63,11 +63,7 @@ export default function ClientDashboard() {
     accounts: [],
   });
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [updatedFullName, setUpdatedFullName] = useState('');
-  const [updatedEmail, setUpdatedEmail] = useState('');
-  const [updatedDateOfBirth, setUpdatedDateOfBirth] = useState('');
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const router = useRouter();
   const {toast} = useToast();
   const [open, setOpen] = React.useState(false)
   const [newAccountCurrency, setNewAccountCurrency] = useState("EUR"); // Default currency
@@ -91,10 +87,9 @@ export default function ClientDashboard() {
             const data = await response.json();
             if (data) {
               setProfile(data);
-              setUpdatedFullName(data.fullName);
-              setUpdatedEmail(data.email);
-              setUpdatedDateOfBirth(data.dateOfBirth);
-              setDate(new Date(data.dateOfBirth)); // Convert the date string to a Date object
+              form.setValue("fullName", data.fullName);
+              form.setValue("email", data.email);
+              form.setValue("dateOfBirth", data.dateOfBirth);
             } else {
               console.warn("Response has no content");
               toast({
@@ -112,7 +107,7 @@ export default function ClientDashboard() {
             })
           }
         } else {
-          console.warn('Failed to fetch profile');
+          console.error('Failed to fetch profile');
           toast({
             variant: "destructive",
             title: "Failed to fetch profile",
@@ -130,7 +125,7 @@ export default function ClientDashboard() {
     };
 
     fetchProfile();
-  }, []);
+  }, [form]);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -178,7 +173,7 @@ export default function ClientDashboard() {
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
-        setIsEditing(false);
+        setOpen(false);
         toast({
           title: "Profile updated successfully!",
           description: "Your profile information has been updated."
@@ -287,7 +282,7 @@ export default function ClientDashboard() {
         });
       }
     } catch (error) {
-      console.error('Error opening account:', error);
+      console.error('Error closing account:', error);
       toast({
         variant: "destructive",
         title: "Error opening account",
@@ -363,7 +358,7 @@ export default function ClientDashboard() {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                         />
                       <FormField
                         control={form.control}
                         name="dateOfBirth"
@@ -376,6 +371,19 @@ export default function ClientDashboard() {
                             <FormMessage />
                           </FormItem>
                         )}
+                      />
+                       <FormField
+                          control={form.control}
+                          name="password"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel>Password</FormLabel>
+                                  <FormControl>
+                                      <Input type="password" placeholder="Password" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
                       />
                       <div className="flex justify-end">
                         <AlertDialogFooter>
