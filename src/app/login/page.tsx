@@ -52,7 +52,7 @@ export default function LoginForm() {
                 })
             }, 1500);
         }
-        setLocalStorageCredentials({email, token: data.token});
+        //setLocalStorageCredentials({email, token: data.token});
       } else {
         console.error('Authentication failed', data);
           toast({

@@ -96,14 +96,49 @@ export async function getUsers(fullName?: string, roleName?: string, ): Promise<
   return users;
 }
 
-export async function createUser(userData: any): Promise<User> {
-  // TODO: Implement this by calling the BankWise Backend API.
-  return {} as User;
+export async function createUser(userData: {
+  fullName: string;
+  email: string;
+  dateOfBirth: string;
+  password: string;
+  roles: Array<{ name: string }>; // Изменили на name вместо id
+}): Promise<User> {
+  const response = await fetch('http://localhost:8080/api/admin/users', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${credentials.token}`
+    },
+    body: JSON.stringify(userData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to create user');
+  }
+
+  return await response.json();
 }
 
-export async function updateUser(userId: number, userData: any): Promise<User> {
-  // TODO: Implement this by calling the BankWise Backend API.
-  return {} as User;
+export async function updateUser(
+    userId: number | undefined,
+    userData: { fullName?: string; email?: string; dateOfBirth?: string; roles?: Array<{ name: string }> }
+): Promise<User> {
+  const response = await fetch(`http://localhost:8080/api/admin/users/${userId}`, {
+    method: 'PATCH', 
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${credentials.token}`
+    },
+    body: JSON.stringify(userData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to update user');
+  }
+
+  return await response.json();
 }
 
 export async function deleteUser(userId: number): Promise<any> {
@@ -143,7 +178,7 @@ export async function deleteRole(roleId: number): Promise<void> {
   return;
 }
 
-export async function getUserAccounts(userId: number ): Promise<Account[]> {
+export async function getUserAccounts(userId: number | undefined): Promise<Account[]> {
   const url = `http://localhost:8080/api/admin/users/${userId}/accounts`;
 
   console.log('Constructed URL:', url);
@@ -184,7 +219,7 @@ export async function closeAccount(iban: string): Promise<Response> {
   return response;
 }
 
-export async function createAccountForUser(userId: number, currency: string): Promise<Account> {
+export async function createAccountForUser(userId: number | undefined, currency: string): Promise<Account> {
   const url = `http://localhost:8080/api/admin/users/${userId}/accounts?currency=${currency}`;
   console.log('Constructed URL:', url);
   console.log('Request Headers:', { 'Authorization': `Bearer ${credentials.token}` });

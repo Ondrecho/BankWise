@@ -1,5 +1,5 @@
 {
-  "name": "nextn",
+  "name": "bankwise",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,8 +12,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@genkit-ai/googleai": "^1.0.4",
-    "@genkit-ai/next": "^1.0.4",
     "@hookform/resolvers": "^4.1.3",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",

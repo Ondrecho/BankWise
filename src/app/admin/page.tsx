@@ -52,7 +52,7 @@ import {
 import { useRouter } from "next/navigation";
 import { 
   getUsers, createUser, updateUser, deleteUser, getRoles, createRole, updateRole, deleteRole, getUserAccounts, closeAccount,
-  User, Role, Account, generateLogs, checkLogStatus, getPageVisitCount, getOverallStatistics, createAccountForUser, deleteAccount, openAccount
+  User, Role, Account, createAccountForUser, deleteAccount, openAccount
 } from "@/services/bankwise-backend";
 
 export default function AdminDashboard() {
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
     console.log("User created");
   };
 
-  const handleDeleteUser = async (userId: number) => {
+  const handleDeleteUser = async (userId: number | undefined) => {
     if (typeof userId !== 'number') {
       console.error('Invalid userId:', userId);
       toast({
@@ -339,19 +339,19 @@ export default function AdminDashboard() {
   const handleCheckStatus = async () => {};
 
   // Stats Management Handlers
-  const handleGetPageVisitCount = async () => {
-    try {
-      const count = await getPageVisitCount(pageUrl);
-      setPageVisitCount(count);
-      toast({
-        title: 'Page visit count fetched!',
-        description: `Page ${pageUrl} has ${count} visits.`,
-      });
-    } catch (error) {
-      console.error('Failed to fetch page visit count:', error);
-      toast({ title: 'Failed to fetch visit count!', description: 'Please try again.', variant: 'destructive' });
-    }
-  };
+  // const handleGetPageVisitCount = async () => {
+  //   try {
+  //     const count = await getPageVisitCount(pageUrl);
+  //     setPageVisitCount(count);
+  //     toast({
+  //       title: 'Page visit count fetched!',
+  //       description: `Page ${pageUrl} has ${count} visits.`,
+  //     });
+  //   } catch (error) {
+  //     console.error('Failed to fetch page visit count:', error);
+  //     toast({ title: 'Failed to fetch visit count!', description: 'Please try again.', variant: 'destructive' });
+  //   }
+  // };
 
   const renderBarChart = (data: { [key: string]: number }) => {
     const chartData = Object.entries(data).map(([url, count]) => ({
@@ -465,8 +465,8 @@ export default function AdminDashboard() {
                       <SelectValue placeholder="Select Role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="ROLE_USER">User</SelectItem>
-                      <SelectItem value="ROLE_ADMIN">Admin</SelectItem>
+                      <SelectItem value="ROLE_USER">ROLE_USER</SelectItem>
+                      <SelectItem value="ROLE_ADMIN">ROLE_ADMIN</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -826,7 +826,7 @@ export default function AdminDashboard() {
                   />
                 </div>
               </div>
-              <Button onClick={handleGetPageVisitCount}>Get Visit Count</Button>
+              {/*<Button onClick={handleGetPageVisitCount}>Get Visit Count</Button>*/}
               {pageVisitCount > 0 && (
                 <div className="mt-4">
                   <h3 className="text-lg font-semibold mb-2">Visit Count</h3>
