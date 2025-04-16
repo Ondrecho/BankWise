@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -13,12 +13,25 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { User, Account, Role } from "@/types";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {index} from "d3-array";
+
 
 export default function AdminDashboard() {
   const { toast } = useToast();
   const router = useRouter();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [newAccountCurrency, setNewAccountCurrency] = useState<string>("");
   const [showCurrencyModal, setShowCurrencyModal] = useState<boolean>(false);
 
@@ -68,6 +81,19 @@ export default function AdminDashboard() {
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
+  };
+
+  const handleUserDelete = (user: User, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setUserToDelete(user);
+  };
+
+  const confirmUserDelete = () => {
+    if (userToDelete) {
+      setUsers(users.filter(u => u.id !== userToDelete.id));
+      toast({ title: "User deleted successfully" });
+      setUserToDelete(null);
+    }
   };
 
   const handleBackToList = () => {
@@ -146,7 +172,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Преобразуем роли для MultiSelect
   const roleOptions = availableRoles.map(role => ({
     value: role.id.toString(),
     label: role.description || role.name
@@ -218,7 +243,7 @@ export default function AdminDashboard() {
                         <CardHeader className="px-0 pt-0">
                           <div className="flex justify-between items-center">
                             <CardTitle>User Management</CardTitle>
-                            <Button onClick={handleCreateUser}>Create New User</Button>
+                            <Button className="flex items-center justify-end pr-6" onClick={handleCreateUser}>Create New User</Button>
                           </div>
                         </CardHeader>
                         <CardContent className="px-0">
@@ -226,16 +251,17 @@ export default function AdminDashboard() {
                             <TableHeader>
                               <TableRow>
                                 <TableHead className="pl-0">Status</TableHead>
-                                <TableHead>Name</TableHead>
+                                <TableHead>Full Name</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Accounts</TableHead>
-                                <TableHead className="pr-0">Roles</TableHead>
+                                <TableHead>Roles</TableHead>
+                                <TableHead className="pr-0">Action</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {users.map((user) => (
                                   <TableRow
-                                      key={user.id}
+                                      key={user.id || `index-${index}`}
                                       className="cursor-pointer hover:bg-gray-50"
                                       onClick={() => handleUserSelect(user)}
                                   >
@@ -259,6 +285,15 @@ export default function AdminDashboard() {
                                             </Badge>
                                         ))}
                                       </div>
+                                    </TableCell>
+                                    <TableCell className="pr-0">
+                                      <Button
+                                          variant="destructive"
+                                          size="sm"
+                                          onClick={(e) => handleUserDelete(user, e)}
+                                      >
+                                        Delete
+                                      </Button>
                                     </TableCell>
                                   </TableRow>
                               ))}
@@ -485,11 +520,49 @@ export default function AdminDashboard() {
                         </CardFooter>
                       </Card>
                   )}
+                  {userToDelete && (
+                      <AlertDialog open onOpenChange={() => setUserToDelete(null)}>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete User</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete user "{userToDelete.fullName}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel
+                                onClick={() => setUserToDelete(null)}
+                                className="mr-2"
+                            >
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                                className="bg-red-500 text-white hover:bg-red-600"
+                                onClick={confirmUserDelete}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                  )}
+
                 </TabsContent>
 
                 <TabsContent value="roles" className="mt-0">
                   <div className="flex items-center justify-center h-64">
                     <p>Role Management content will be here</p>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="logs" className="mt-0">
+                  <div className="flex items-center justify-center h-64">
+                    <p>Logs Management content will be here</p>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="stats" className="mt-0">
+                  <div className="flex items-center justify-center h-64">
+                    <p>Stats content will be here</p>
                   </div>
                 </TabsContent>
               </div>
