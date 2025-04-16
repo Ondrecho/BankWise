@@ -11,24 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-type User = {
-  id: number;
-  fullName: string;
-  email: string;
-  dateOfBirth: string;
-  status: 'active' | 'blocked';
-  roles: string[];
-  accounts: Account[];
-};
-
-type Account = {
-  id: number;
-  iban: string;
-  balance: number;
-  currency: string;
-  status: 'active' | 'closed';
-};
+import { MultiSelect } from "@/components/ui/multi-select";
+import { User, Account, Role } from "@/types";
 
 export default function AdminDashboard() {
   const { toast } = useToast();
@@ -36,29 +20,34 @@ export default function AdminDashboard() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
 
-  // Mock data
+  // Mock roles data - будет заменено на запрос к API
+  const [availableRoles, setAvailableRoles] = useState<Role[]>([
+    { id: 1, name: 'individual', description: 'Частное лицо' },
+    { id: 2, name: 'business', description: 'Юридическое лицо' },
+    { id: 3, name: 'admin', description: 'Администратор' },
+    { id: 4, name: 'support', description: 'Поддержка' },
+    { id: 5, name: 'auditor', description: 'Аудитор' }
+  ]);
+
+  // Mock users data - будет заменено на запрос к API
   const [users, setUsers] = useState<User[]>([
     {
       id: 1,
       fullName: "John Doe",
       email: "john@example.com",
       dateOfBirth: "1990-01-01",
-      status: "active",
-      roles: ["Admin"],
+      active: true,
+      roles: [{ id: 3, name: 'admin', description: 'Администратор' }],
       accounts: [
-        { id: 1, iban: "BY00OLMP31310000000000000001", balance: 1000, currency: "USD", status: "active" },
-        { id: 2, iban: "BY00OLMP31310000000000000002", balance: 500, currency: "EUR", status: "active" }
-      ]
-    },
-    {
-      id: 2,
-      fullName: "Jane Smith",
-      email: "jane@example.com",
-      dateOfBirth: "1992-05-15",
-      status: "active",
-      roles: ["User"],
-      accounts: [
-        { id: 3, iban: "BY00OLMP31310000000000000003", balance: 200, currency: "BYN", status: "active" }
+        {
+          id: 1,
+          iban: "BY00OLMP31310000000000000001",
+          balance: 1000,
+          currency: "USD",
+          status: "ACTIVE",
+          createdAt: "2023-01-01",
+          userId: 1
+        }
       ]
     }
   ]);
@@ -78,6 +67,7 @@ export default function AdminDashboard() {
 
   const handleBackToList = () => {
     setSelectedUser(null);
+    setIsCreatingUser(false);
   };
 
   const handleCreateUser = () => {
@@ -87,40 +77,73 @@ export default function AdminDashboard() {
       fullName: "",
       email: "",
       dateOfBirth: "",
-      status: "active",
+      active: true,
       roles: [],
       accounts: []
     });
   };
 
   const handleSaveUser = () => {
-    // Здесь будет логика сохранения пользователя
     if (isCreatingUser) {
+      // Mock create user
+      const newUser = {
+        ...selectedUser!,
+        id: Math.max(...users.map(u => u.id)) + 1
+      };
+      setUsers([...users, newUser]);
       toast({ title: "User created successfully" });
     } else {
+      // Mock update user
+      setUsers(users.map(u => u.id === selectedUser?.id ? selectedUser : u));
       toast({ title: "User updated successfully" });
     }
-    setSelectedUser(null);
-    setIsCreatingUser(false);
-  };
-
-  const handleBlockUser = () => {
-    if (!selectedUser) return;
-    // Здесь будет логика блокировки пользователя
-    toast({ title: `User ${selectedUser.status === 'active' ? 'blocked' : 'unblocked'}` });
-    setSelectedUser(null);
+    handleBackToList();
   };
 
   const handleCreateAccount = () => {
     if (!selectedUser) return;
-    // Здесь будет логика создания счета
+    const newAccount: Account = {
+      id: Math.max(0, ...selectedUser.accounts?.map(a => a.id) || []) + 1,
+      iban: `BY00OLMP313100000000000000${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+      balance: 0,
+      currency: "USD",
+      status: "ACTIVE",
+      createdAt: new Date().toISOString(),
+      userId: selectedUser.id
+    };
+    setSelectedUser({
+      ...selectedUser,
+      accounts: [...(selectedUser.accounts || []), newAccount]
+    });
     toast({ title: "Account created successfully" });
   };
 
   const handleAccountAction = (action: 'close' | 'delete', iban: string) => {
-    // Здесь будет логика действий со счетом
-    toast({ title: `Account ${action === 'close' ? 'closed' : 'deleted'}` });
+    if (!selectedUser || !selectedUser.accounts) return;
+
+    if (action === 'close') {
+      setSelectedUser({
+        ...selectedUser,
+        accounts: selectedUser.accounts.map(a =>
+            a.iban === iban ? {
+              ...a,
+              status: a.status === 'ACTIVE' ? 'CLOSED' : 'ACTIVE'
+            } : a
+        )
+      });
+    } else {
+      setSelectedUser({
+        ...selectedUser,
+        accounts: selectedUser.accounts.filter(a => a.iban !== iban)
+      });
+    }
   };
+
+  // Преобразуем роли для MultiSelect
+  const roleOptions = availableRoles.map(role => ({
+    value: role.name,
+    label: role.description || role.name
+  }));
 
   return (
       <div className="flex flex-col min-h-screen bg-gray-50">
@@ -142,33 +165,31 @@ export default function AdminDashboard() {
         <main className="flex-1 p-6">
           <Card className="overflow-hidden">
             <Tabs defaultValue="users" className="w-full">
-              <TabsList className="rounded-none border-b bg-gray-50 px-6 py-4">
-                <div className="flex space-x-4">
-                  <TabsTrigger value="users">
-                  <span className="flex items-center">
-                    <UsersIcon className="h-4 w-4 mr-2" />
-                    User Management
-                  </span>
-                  </TabsTrigger>
-                  <TabsTrigger value="roles">
-                  <span className="flex items-center">
-                    <ShieldIcon className="h-4 w-4 mr-2" />
-                    Role Management
-                  </span>
-                  </TabsTrigger>
-                  <TabsTrigger value="logs">
-                  <span className="flex items-center">
-                    <FileTextIcon className="h-4 w-4 mr-2" />
-                    Logs Management
-                  </span>
-                  </TabsTrigger>
-                  <TabsTrigger value="stats">
-                  <span className="flex items-center">
-                    <BarChartIcon className="h-4 w-4 mr-2" />
-                    Statistics
-                  </span>
-                  </TabsTrigger>
-                </div>
+              <TabsList className="w-full grid grid-cols-4 rounded-none border-b bg-gray-50 px-0">
+                <TabsTrigger value="users" className="py-4 px-6">
+                <span className="flex items-center">
+                  <UsersIcon className="h-4 w-4 mr-2" />
+                  User Management
+                </span>
+                </TabsTrigger>
+                <TabsTrigger value="roles" className="py-4 px-6">
+                <span className="flex items-center">
+                  <ShieldIcon className="h-4 w-4 mr-2" />
+                  Role Management
+                </span>
+                </TabsTrigger>
+                <TabsTrigger value="logs" className="py-4 px-6">
+                <span className="flex items-center">
+                  <FileTextIcon className="h-4 w-4 mr-2" />
+                  Logs Management
+                </span>
+                </TabsTrigger>
+                <TabsTrigger value="stats" className="py-4 px-6">
+                <span className="flex items-center">
+                  <BarChartIcon className="h-4 w-4 mr-2" />
+                  Statistics
+                </span>
+                </TabsTrigger>
               </TabsList>
 
               <div className="p-6">
@@ -200,18 +221,18 @@ export default function AdminDashboard() {
                                       onClick={() => handleUserSelect(user)}
                                   >
                                     <TableCell>
-                                      <Badge variant={user.status === "active" ? "default" : "destructive"}>
-                                        {user.status}
+                                      <Badge variant={user.active ? "default" : "destructive"}>
+                                        {user.active ? "active" : "blocked"}
                                       </Badge>
                                     </TableCell>
                                     <TableCell className="font-medium">{user.fullName}</TableCell>
                                     <TableCell>{user.email}</TableCell>
-                                    <TableCell>{user.accounts.length}</TableCell>
+                                    <TableCell>{user.accounts?.length || 0}</TableCell>
                                     <TableCell>
                                       <div className="flex flex-wrap gap-1">
-                                        {user.roles.map((role, index) => (
-                                            <Badge key={index} variant="secondary">
-                                              {role}
+                                        {user.roles?.map((role) => (
+                                            <Badge key={role.id} variant="secondary">
+                                              {role.description || role.name}
                                             </Badge>
                                         ))}
                                       </div>
@@ -276,10 +297,10 @@ export default function AdminDashboard() {
                               <div className="space-y-2">
                                 <Label htmlFor="status">Status</Label>
                                 <Select
-                                    value={selectedUser.status}
+                                    value={selectedUser.active ? "active" : "blocked"}
                                     onValueChange={(value) => setSelectedUser({
                                       ...selectedUser,
-                                      status: value as 'active' | 'blocked'
+                                      active: value === "active"
                                     })}
                                 >
                                   <SelectTrigger>
@@ -292,14 +313,24 @@ export default function AdminDashboard() {
                                 </Select>
                               </div>
                               <div className="space-y-2">
-                                <Label>Roles</Label>
-                                <div className="flex flex-wrap gap-2">
-                                  {selectedUser.roles.map((role, index) => (
-                                      <Badge key={index} variant="secondary">
-                                        {role}
-                                      </Badge>
-                                  ))}
-                                </div>
+                                <Label htmlFor="roles">Roles</Label>
+                                <MultiSelect
+                                    options={roleOptions}
+                                    selected={selectedUser.roles?.map(role => ({
+                                      value: role.name,
+                                      label: role.description || role.name
+                                    })) || []}
+                                    onChange={(selected) => {
+                                      const selectedRoles = availableRoles.filter(role =>
+                                          selected.some(s => s.value === role.name)
+                                      );
+                                      setSelectedUser({
+                                        ...selectedUser,
+                                        roles: selectedRoles
+                                      });
+                                    }}
+                                    placeholder="Select roles..."
+                                />
                               </div>
                             </div>
 
@@ -313,7 +344,7 @@ export default function AdminDashboard() {
                                   </Button>
                                 </div>
                                 <div className="space-y-2">
-                                  {selectedUser.accounts.map((account) => (
+                                  {selectedUser.accounts?.map((account) => (
                                       <Card key={account.id}>
                                         <CardContent className="p-4">
                                           <div className="flex justify-between items-center">
@@ -322,6 +353,9 @@ export default function AdminDashboard() {
                                               <p className="text-sm text-gray-500">
                                                 {account.currency} • {account.balance}
                                               </p>
+                                              <Badge variant={account.status === 'ACTIVE' ? 'default' : 'destructive'}>
+                                                {account.status}
+                                              </Badge>
                                             </div>
                                             <div className="space-x-2">
                                               <Button
@@ -329,7 +363,7 @@ export default function AdminDashboard() {
                                                   size="sm"
                                                   onClick={() => handleAccountAction('close', account.iban)}
                                               >
-                                                {account.status === 'active' ? 'Close' : 'Open'}
+                                                {account.status === 'ACTIVE' ? 'Close' : 'Open'}
                                               </Button>
                                               <Button
                                                   variant="destructive"
@@ -348,15 +382,7 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         </CardContent>
-                        <CardFooter className="flex justify-between">
-                          {!isCreatingUser && (
-                              <Button
-                                  variant={selectedUser.status === 'active' ? "destructive" : "default"}
-                                  onClick={handleBlockUser}
-                              >
-                                {selectedUser.status === 'active' ? 'Block User' : 'Unblock User'}
-                              </Button>
-                          )}
+                        <CardFooter className="flex justify-end">
                           <Button onClick={handleSaveUser}>
                             {isCreatingUser ? 'Create User' : 'Save Changes'}
                           </Button>
