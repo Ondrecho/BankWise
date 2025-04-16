@@ -32,6 +32,7 @@ export default function AdminDashboard() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [accountToDelete, setAccountToDelete] = useState<Account | null>(null);
   const [newAccountCurrency, setNewAccountCurrency] = useState<string>("");
   const [showCurrencyModal, setShowCurrencyModal] = useState<boolean>(false);
 
@@ -158,19 +159,32 @@ export default function AdminDashboard() {
       setSelectedUser({
         ...selectedUser,
         accounts: selectedUser.accounts.map(a =>
-            a.iban === iban ? {
-              ...a,
-              status: a.status === 'ACTIVE' ? 'CLOSED' : 'ACTIVE'
-            } : a
+            a.iban === iban
+                ? { ...a, status: a.status === 'ACTIVE' ? 'CLOSED' : 'ACTIVE' }
+                : a
         )
       });
     } else {
-      setSelectedUser({
-        ...selectedUser,
-        accounts: selectedUser.accounts.filter(a => a.iban !== iban)
-      });
+      const account = selectedUser.accounts.find(a => a.iban === iban);
+      if (account) {
+        setAccountToDelete(account);
+      }
     }
   };
+
+  const confirmAccountDelete = () => {
+    if (selectedUser && accountToDelete) {
+      if (!selectedUser || !selectedUser.accounts) return;
+
+      setSelectedUser({
+        ...selectedUser,
+        accounts: selectedUser.accounts.filter(a => a.iban !== accountToDelete.iban)
+      });
+      toast({ title: "Account deleted successfully" });
+      setAccountToDelete(null);
+    }
+  };
+
 
   const roleOptions = availableRoles.map(role => ({
     value: role.id.toString(),
@@ -468,6 +482,26 @@ export default function AdminDashboard() {
                                         </CardContent>
                                       </Card>
                                   ))}
+                                  {accountToDelete && (
+                                      <AlertDialog open onOpenChange={() => setAccountToDelete(null)}>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              Are you sure you want to delete account "{accountToDelete.iban}"? This action cannot be undone.
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogCancel onClick={() => setAccountToDelete(null)} className="mr-2">
+                                              Cancel
+                                            </AlertDialogCancel>
+                                            <AlertDialogAction className="bg-red-500 text-white hover:bg-red-600" onClick={confirmAccountDelete}>
+                                              Delete
+                                            </AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                  )}
                                 </div>
                               </div>
                               {showCurrencyModal && (
