@@ -87,6 +87,24 @@ body {
   }
 }
 
+@layer components {
+  .admin-container {
+    @apply container mx-auto px-4 py-6;
+  }
+  .admin-card {
+    @apply bg-white rounded-lg shadow-md overflow-hidden;
+  }
+  .admin-table {
+    @apply min-w-full divide-y divide-gray-200;
+  }
+  .admin-table th {
+    @apply px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+  }
+  .admin-table td {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  }
+}
+
 @keyframes fade-in {
     from { opacity: 0; }
     to { opacity: 1; }

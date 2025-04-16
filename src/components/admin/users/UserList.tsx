@@ -1,17 +1,27 @@
+// components/admin/users/UserList.tsx
+
+import { useRouter } from "next/navigation";
 import { User } from "@/types";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserCheck, UserX, Wallet } from "lucide-react";
 
 interface UserListProps {
     users: User[];
-    onEdit: (user: User) => void;
     onDelete: (id: number) => void;
-    onViewAccounts: (user: User) => void;
 }
 
-export function UserList({ users, onEdit, onDelete, onViewAccounts }: UserListProps) {
+export function UserList({ users, onDelete }: UserListProps) {
+    const router = useRouter();
+
     return (
         <Table>
             <TableHeader>
@@ -21,12 +31,16 @@ export function UserList({ users, onEdit, onDelete, onViewAccounts }: UserListPr
                     <TableHead>Email</TableHead>
                     <TableHead>Accounts</TableHead>
                     <TableHead>Roles</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-right">Delete</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {users.map((user) => (
-                    <TableRow key={user.id}>
+                    <TableRow
+                        key={user.id}
+                        className="cursor-pointer hover:bg-muted"
+                        onClick={() => router.push(`/admin/users/${user.id}`)}
+                    >
                         <TableCell>
                             {user.active ? (
                                 <Badge className="bg-green-500">
@@ -47,20 +61,21 @@ export function UserList({ users, onEdit, onDelete, onViewAccounts }: UserListPr
                             </div>
                         </TableCell>
                         <TableCell>
-                            {user.roles.map(role => (
+                            {user.roles.map((role) => (
                                 <Badge key={role.id} variant="secondary" className="mr-1">
                                     {role.name}
                                 </Badge>
                             ))}
                         </TableCell>
-                        <TableCell className="text-right space-x-2">
-                            <Button variant="outline" size="sm" onClick={() => onEdit(user)}>
-                                Edit
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => onViewAccounts(user)}>
-                                Accounts
-                            </Button>
-                            <Button variant="destructive" size="sm" onClick={() => onDelete(user.id)}>
+                        <TableCell className="text-right">
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDelete(user.id);
+                                }}
+                            >
                                 Delete
                             </Button>
                         </TableCell>

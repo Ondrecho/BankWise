@@ -24,6 +24,7 @@ export interface Role {
 }
 
 export interface Account {
+    createdAt: string;
     id: number;
     iban: string;
     balance: number;
