@@ -435,10 +435,48 @@ export default function AdminDashboard() {
                                   ))}
                                 </div>
                               </div>
+                              {showCurrencyModal && (
+                                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                                    <div className="bg-white rounded-lg p-6 w-80">
+                                      <h2 className="text-lg font-semibold mb-4">Select Currency</h2>
+                                      {/* Пример: Имеется небольшой селект с валютами; можно расширить список */}
+                                      <select
+                                          className="w-full border p-2 rounded mb-4"
+                                          value={newAccountCurrency}
+                                          onChange={(e) => setNewAccountCurrency(e.target.value)}
+                                      >
+                                        <option value="">Select Currency</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="BYN">BYN</option>
+                                      </select>
+                                      <div className="flex justify-end gap-2">
+                                        <Button variant="outline" onClick={() => {
+                                          setShowCurrencyModal(false);
+                                          setNewAccountCurrency("");
+                                        }}>
+                                          Cancel
+                                        </Button>
+                                        <Button
+                                            onClick={() => {
+                                              if (newAccountCurrency) {
+                                                handleCreateAccount(newAccountCurrency);
+                                                setShowCurrencyModal(false);
+                                                setNewAccountCurrency("");
+                                              } else {
+                                                toast({ title: "Please select a currency" });
+                                              }
+                                            }}
+                                        >
+                                          Confirm
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                              )}
                             </TabsContent>
                           </Tabs>
                         </CardContent>
-                        {/* Футер для мобильных устройств */}
                         <CardFooter className="flex justify-end gap-2 px-4 py-4 md:hidden">
                           <Button variant="outline" onClick={handleBackToList}>Cancel</Button>
                           <Button onClick={handleSaveUser}>
@@ -446,8 +484,6 @@ export default function AdminDashboard() {
                           </Button>
                         </CardFooter>
                       </Card>
-                      /* --- Конец изменённого блока --- */
-
                   )}
                 </TabsContent>
 
