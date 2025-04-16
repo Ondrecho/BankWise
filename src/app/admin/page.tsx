@@ -20,16 +20,19 @@ export default function AdminDashboard() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
 
-  // Mock roles data - будет заменено на запрос к API
+  // Mock roles data
   const [availableRoles, setAvailableRoles] = useState<Role[]>([
     { id: 1, name: 'individual', description: 'Частное лицо' },
     { id: 2, name: 'business', description: 'Юридическое лицо' },
     { id: 3, name: 'admin', description: 'Администратор' },
     { id: 4, name: 'support', description: 'Поддержка' },
-    { id: 5, name: 'auditor', description: 'Аудитор' }
+    { id: 6, name: 'auditor', description: 'Аудитор' },
+    { id: 7, name: 'auditor2', description: 'Аудитор2' },
+    { id: 8, name: 'auditor3', description: 'Аудитор3' },
+    { id: 9, name: 'auditor4', description: 'Аудитор4' }
   ]);
 
-  // Mock users data - будет заменено на запрос к API
+  // Mock users data
   const [users, setUsers] = useState<User[]>([
     {
       id: 1,
@@ -141,7 +144,7 @@ export default function AdminDashboard() {
 
   // Преобразуем роли для MultiSelect
   const roleOptions = availableRoles.map(role => ({
-    value: role.name,
+    value: role.id.toString(),
     label: role.description || role.name
   }));
 
@@ -154,7 +157,7 @@ export default function AdminDashboard() {
             <Button
                 variant="outline"
                 onClick={handleLogout}
-                className="text-gray-600 hover:bg-gray-100"
+                className="text-gray-600 hover:bg-gray-300 hover:text-gray-900"
             >
               Logout
             </Button>
@@ -163,54 +166,66 @@ export default function AdminDashboard() {
 
         {/* Main Content */}
         <main className="flex-1 p-6">
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden border-none shadow-none">
             <Tabs defaultValue="users" className="w-full">
-              <TabsList className="w-full grid grid-cols-4 rounded-none border-b bg-gray-50 px-0">
-                <TabsTrigger value="users" className="py-4 px-6">
-                <span className="flex items-center">
-                  <UsersIcon className="h-4 w-4 mr-2" />
-                  User Management
-                </span>
+              <TabsList className="h-auto w-full grid grid-cols-4 bg-transparent px-0 gap-1">
+                <TabsTrigger
+                    value="users"
+                    className="py-3 px-4 data-[state=active]:shadow-none rounded-t-lg border-b-2 data-[state=active]:border-green-500 data-[state=active]:bg-transparent"
+                >
+                  <span className="flex items-center">
+                    <UsersIcon className="h-4 w-4 mr-2" />
+                    User Management
+                  </span>
                 </TabsTrigger>
-                <TabsTrigger value="roles" className="py-4 px-6">
-                <span className="flex items-center">
-                  <ShieldIcon className="h-4 w-4 mr-2" />
-                  Role Management
-                </span>
+                <TabsTrigger
+                    value="roles"
+                    className="py-3 px-4 data-[state=active]:shadow-none rounded-t-lg border-b-2 data-[state=active]:border-green-500 data-[state=active]:bg-transparent"
+                >
+                  <span className="flex items-center">
+                    <ShieldIcon className="h-4 w-4 mr-2" />
+                    Role Management
+                  </span>
                 </TabsTrigger>
-                <TabsTrigger value="logs" className="py-4 px-6">
-                <span className="flex items-center">
-                  <FileTextIcon className="h-4 w-4 mr-2" />
-                  Logs Management
-                </span>
+                <TabsTrigger
+                    value="logs"
+                    className="py-3 px-4 data-[state=active]:shadow-none rounded-t-lg border-b-2 data-[state=active]:border-green-500 data-[state=active]:bg-transparent"
+                >
+                  <span className="flex items-center">
+                    <FileTextIcon className="h-4 w-4 mr-2" />
+                    Logs Management
+                  </span>
                 </TabsTrigger>
-                <TabsTrigger value="stats" className="py-4 px-6">
-                <span className="flex items-center">
-                  <BarChartIcon className="h-4 w-4 mr-2" />
-                  Statistics
-                </span>
+                <TabsTrigger
+                    value="stats"
+                    className="py-3 px-4 data-[state=active]:shadow-none rounded-t-lg border-b-2 data-[state=active]:border-green-500 data-[state=active]:bg-transparent"
+                >
+                  <span className="flex items-center">
+                    <BarChartIcon className="h-4 w-4 mr-2" />
+                    Statistics
+                  </span>
                 </TabsTrigger>
               </TabsList>
 
               <div className="p-6">
                 <TabsContent value="users" className="mt-0">
                   {!selectedUser ? (
-                      <Card>
-                        <CardHeader>
+                      <Card className="border-none shadow-sm">
+                        <CardHeader className="px-0 pt-0">
                           <div className="flex justify-between items-center">
                             <CardTitle>User Management</CardTitle>
                             <Button onClick={handleCreateUser}>Create New User</Button>
                           </div>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="px-0">
                           <Table>
                             <TableHeader>
                               <TableRow>
-                                <TableHead>Status</TableHead>
+                                <TableHead className="pl-0">Status</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Accounts</TableHead>
-                                <TableHead>Roles</TableHead>
+                                <TableHead className="pr-0">Roles</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -220,7 +235,7 @@ export default function AdminDashboard() {
                                       className="cursor-pointer hover:bg-gray-50"
                                       onClick={() => handleUserSelect(user)}
                                   >
-                                    <TableCell>
+                                    <TableCell className="pl-0">
                                       <Badge variant={user.active ? "default" : "destructive"}>
                                         {user.active ? "active" : "blocked"}
                                       </Badge>
@@ -228,10 +243,14 @@ export default function AdminDashboard() {
                                     <TableCell className="font-medium">{user.fullName}</TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell>{user.accounts?.length || 0}</TableCell>
-                                    <TableCell>
-                                      <div className="flex flex-wrap gap-1">
+                                    <TableCell className="pr-0">
+                                      <div className="inline-flex flex-wrap gap-1">
                                         {user.roles?.map((role) => (
-                                            <Badge key={role.id} variant="secondary">
+                                            <Badge
+                                                key={role.id}
+                                                variant="secondary"
+                                                className="px-2 py-0.5 text-xs"
+                                            >
                                               {role.description || role.name}
                                             </Badge>
                                         ))}
@@ -244,18 +263,18 @@ export default function AdminDashboard() {
                         </CardContent>
                       </Card>
                   ) : (
-                      <Card>
-                        <CardHeader>
+                      <Card className="border-none shadow-sm">
+                        <CardHeader className="px-0 pt-0">
                           <div className="flex justify-between items-center">
                             <CardTitle>
                               {isCreatingUser ? "Create New User" : selectedUser.fullName}
                             </CardTitle>
-                            <Button variant="outline" onClick={handleBackToList}>
-                              Back to list
+                            <Button variant="destructive" onClick={handleBackToList}>
+                              Cancel
                             </Button>
                           </div>
                         </CardHeader>
-                        <CardContent className="space-y-6">
+                        <CardContent className="space-y-6 px-0">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
                               <h3 className="text-lg font-semibold">Personal Information</h3>
@@ -317,12 +336,12 @@ export default function AdminDashboard() {
                                 <MultiSelect
                                     options={roleOptions}
                                     selected={selectedUser.roles?.map(role => ({
-                                      value: role.name,
+                                      value: role.id.toString(),
                                       label: role.description || role.name
                                     })) || []}
-                                    onChange={(selected) => {
+                                    onChangeAction={(selected) => {
                                       const selectedRoles = availableRoles.filter(role =>
-                                          selected.some(s => s.value === role.name)
+                                          selected.some(s => s.value === role.id.toString())
                                       );
                                       setSelectedUser({
                                         ...selectedUser,
@@ -382,7 +401,7 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         </CardContent>
-                        <CardFooter className="flex justify-end">
+                        <CardFooter className="flex justify-end px-0 pb-0">
                           <Button onClick={handleSaveUser}>
                             {isCreatingUser ? 'Create User' : 'Save Changes'}
                           </Button>

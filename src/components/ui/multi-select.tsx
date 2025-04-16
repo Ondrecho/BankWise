@@ -1,4 +1,3 @@
-// components/ui/multi-select.tsx
 'use client';
 import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -9,7 +8,7 @@ import {
     CommandEmpty,
     CommandGroup,
     CommandInput,
-    CommandItem,
+    CommandItem as BaseCommandItem,
 } from "@/components/ui/command";
 import {
     Popover,
@@ -23,26 +22,62 @@ export interface MultiSelectOption {
     label: string;
 }
 
+const MAX_VISIBLE_BADGES = 3;
+
 interface MultiSelectProps {
     options: MultiSelectOption[];
     selected: MultiSelectOption[];
-    onChange: (selected: MultiSelectOption[]) => void;
+    onChangeAction: (selected: MultiSelectOption[]) => void; // Переименование onChange
     placeholder?: string;
 }
+
+interface CommandItemProps extends React.HTMLAttributes<HTMLDivElement> {
+    value: string;
+    onSelect: () => void;
+}
+
+function CommandItem({ value, onSelect, isSelected, ...props }: CommandItemProps & { isSelected: boolean }) {
+    return (
+        <BaseCommandItem
+            {...props}
+            onClick={onSelect}
+            className={cn(
+                "relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none",
+                "hover:bg-accent hover:text-white focus:bg-accent focus:text-white",
+                "data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+            )}
+        >
+            <Check
+                className={cn(
+                    "absolute left-2 h-4 w-4 transition-opacity",
+                    isSelected ? "opacity-100 text-black" : "opacity-0",
+                    "group-hover:text-white"
+                )}
+            />
+            {value}
+        </BaseCommandItem>
+    );
+}
+
 
 export function MultiSelect({
                                 options,
                                 selected,
-                                onChange,
+                                onChangeAction,
                                 placeholder = "Select items...",
                             }: MultiSelectProps) {
     const [open, setOpen] = React.useState(false);
+    const [searchTerm, setSearchTerm] = React.useState("");
+
+    const filteredOptions = options.filter(option =>
+        option.label.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const handleSelect = (option: MultiSelectOption) => {
         if (selected.some(item => item.value === option.value)) {
-            onChange(selected.filter(item => item.value !== option.value));
+            onChangeAction(selected.filter(item => item.value !== option.value));
         } else {
-            onChange([...selected, option]);
+            onChangeAction([...selected, option]);
         }
     };
 
@@ -53,15 +88,26 @@ export function MultiSelect({
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="w-full justify-between"
+                    className="w-full justify-between focus:ring-0 hover:bg-transparent"
                 >
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex items-center gap-1 overflow-hidden">
                         {selected.length > 0 ? (
-                            selected.map(item => (
-                                <Badge key={item.value} variant="secondary">
-                                    {item.label}
-                                </Badge>
-                            ))
+                            <>
+                                {selected.slice(0, MAX_VISIBLE_BADGES).map(item => (
+                                    <Badge
+                                        key={item.value}
+                                        variant="secondary"
+                                        className="px-2 py-0.5 text-xs truncate"
+                                    >
+                                        {item.label}
+                                    </Badge>
+                                ))}
+                                {selected.length > MAX_VISIBLE_BADGES && (
+                                    <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+                                        +{selected.length - MAX_VISIBLE_BADGES} more
+                                    </Badge>
+                                )}
+                            </>
                         ) : (
                             <span className="text-muted-foreground">{placeholder}</span>
                         )}
@@ -71,13 +117,21 @@ export function MultiSelect({
             </PopoverTrigger>
             <PopoverContent className="w-full p-0">
                 <Command>
-                    <CommandInput placeholder="Search items..." />
+                    <CommandInput
+                        placeholder="Search items..."
+                        onChange={(e) => setSearchTerm(e.target.value)} // Исправлено использование onChange
+                    />
                     <CommandEmpty>No items found.</CommandEmpty>
                     <CommandGroup className="max-h-60 overflow-y-auto">
-                        {options.map((option) => (
+                        {filteredOptions.map(option => (
                             <CommandItem
                                 key={option.value}
-                                onSelect={() => handleSelect(option)}
+                                value={option.label}
+                                isSelected={selected.some(item => item.value === option.value)}
+                                onSelect={() => {
+                                    handleSelect(option);
+                                    setSearchTerm("");
+                                }}
                             >
                                 <Check
                                     className={cn(
