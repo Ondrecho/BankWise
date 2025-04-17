@@ -65,8 +65,12 @@ export function useUsers() {
         setSelectedUser(user);
     };
 
-    const handleUserDelete = (user: User) => {
-        setUserToDelete(user);
+    const handleUserDelete = (user: User | null) => {
+        if (user) {
+            setUserToDelete(user);
+        } else {
+            setUserToDelete(null);
+        }
     };
 
     const confirmUserDelete = async () => {

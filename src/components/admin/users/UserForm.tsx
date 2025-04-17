@@ -9,13 +9,6 @@ import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Badge} from "@/components/ui/badge";
-import {
-    AlertDialog, AlertDialogAction, AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription, AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle
-} from "@/components/ui/alert-dialog";
 import CreateAccountModal from "@/components/admin/users/CreateAccountModal";
 
 
@@ -39,20 +32,13 @@ export const UserForm = ({
                              onAccountAction
                          }: UserFormProps) => {
     const [showCurrencyModal, setShowCurrencyModal] = useState(false);
-    const [accountToDelete, setAccountToDelete] = useState<Account | null>(null);
-    const [newAccountCurrency, setNewAccountCurrency] = useState<string>("");
+    const [, setNewAccountCurrency] = useState<string>("");
 
     const roleOptions = roles.map(role => ({
         value: role.id.toString(),
         label: role.description || role.name
     }));
 
-    const confirmAccountDelete = () => {
-        if (accountToDelete) {
-            onAccountAction('delete', accountToDelete.iban);
-            setAccountToDelete(null);
-        }
-    };
     return (
         <Card className="border-none shadow-sm">
             <CardHeader className="px-4 pt-4">
@@ -212,7 +198,7 @@ export const UserForm = ({
                                                     <Button
                                                         variant="destructive"
                                                         size="sm"
-                                                        onClick={() => setAccountToDelete(account)}
+                                                        onClick={() => onAccountAction('delete', account.iban)}
                                                     >
                                                         Delete
                                                     </Button>
@@ -242,29 +228,6 @@ export const UserForm = ({
                     setNewAccountCurrency("");
                 }}
             />
-
-            <AlertDialog
-                open={!!accountToDelete}
-                onOpenChange={(open) => !open && setAccountToDelete(null)}
-            >
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Account</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to delete account "{accountToDelete?.iban}"? This action cannot be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            className="bg-red-500 hover:bg-red-600"
-                            onClick={confirmAccountDelete}
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
         </Card>
     );
 };

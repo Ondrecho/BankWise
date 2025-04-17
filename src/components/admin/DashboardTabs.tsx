@@ -14,7 +14,7 @@ interface DashboardTabsProps {
     userToDelete: User | null;
     accountToDelete: Account | null;
     onUserSelect: (user: User) => void;
-    onUserDelete: (user: User) => void;
+    onUserDelete: (user: User | null) => void;
     onConfirmUserDelete: () => void;
     onCreateUser: () => void;
     onSaveUser: () => void;
@@ -118,7 +118,7 @@ export function DashboardTabs({
                         user={userToDelete}
                         open={!!userToDelete}
                         onConfirmAction={onConfirmUserDelete}
-                        onCancelAction={() => onSetAccountToDelete(null)}
+                        onCancelAction={() => onUserDelete(null)}
                     />
 
                     <DeleteAccountDialog
