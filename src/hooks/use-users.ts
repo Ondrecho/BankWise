@@ -169,11 +169,11 @@ export function useUsers() {
         }
     };
 
-    const handleAccountAction = (action: 'close' | 'delete', iban: string) => {
+    const handleAccountAction = (action: 'toggle-status' | 'delete', iban: string) => {
         if (!selectedUser || !selectedUser.accounts) return;
 
         try {
-            if (action === 'close') {
+            if (action === 'toggle-status') {
                 const updatedUser = {
                     ...selectedUser,
                     accounts: selectedUser.accounts.map(a =>
@@ -187,7 +187,7 @@ export function useUsers() {
                 };
                 setSelectedUser(updatedUser);
                 setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
-            } else {
+            } else if (action === 'delete')  {
                 const account = selectedUser.accounts.find(a => a.iban === iban);
                 if (account) {
                     setAccountToDelete(account);
@@ -227,7 +227,7 @@ export function useUsers() {
 
     const handleLogout = () => {
         localStorage.removeItem('credentials');
-        router.push('/login');
+        router.push('/auth/login');
         toast({
             title: "Logged out",
             description: "You have been successfully logged out.",

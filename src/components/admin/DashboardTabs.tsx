@@ -20,7 +20,7 @@ interface DashboardTabsProps {
     onSaveUser: () => void;
     onBackToList: () => void;
     onCreateAccount: (currency: string) => void;
-    onAccountAction: (action: 'close' | 'delete', iban: string) => void;
+    onAccountAction: (action: 'toggle-status' | 'delete', iban: string) => void;
     onConfirmAccountDelete: () => void;
     onSetAccountToDelete: (account: Account | null) => void;
     onUserChange: (user: User) => void;

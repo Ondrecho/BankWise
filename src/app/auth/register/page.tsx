@@ -30,7 +30,7 @@ export default function RegisterForm() {
             });
 
             if (response.ok) {
-                router.push('/login'); // Redirect to login after successful registration
+                router.push('/auth/login'); // Redirect to login after successful registration
             } else {
                 console.error('Registration failed');
             }

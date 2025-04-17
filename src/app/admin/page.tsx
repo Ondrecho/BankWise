@@ -11,10 +11,10 @@ export default function AdminDashboard() {
   const {
     users,
     selectedUser,
-    isCreating,
     userToDelete,
     accountToDelete,
     availableRoles,
+    handleLogout,
     handleUserSelect,
     handleUserDelete,
     confirmUserDelete,
@@ -27,12 +27,6 @@ export default function AdminDashboard() {
     setAccountToDelete,
     setSelectedUser
   } = useUsers();
-
-  const handleLogout = () => {
-    localStorage.removeItem('credentials');
-    router.push('/login');
-    toast({ title: "Logged out successfully" });
-  };
 
   return (
       <div className="flex flex-col min-h-screen bg-gray-50">

@@ -98,7 +98,7 @@ export default function LoginForm() {
                 <Button type="submit">Log In</Button>
             </form>
         )}
-      <Button variant="link" onClick={() => router.push('/register')}>
+      <Button variant="link" onClick={() => router.push('/auth/register')}>
         Sign Up
       </Button>
     </div>

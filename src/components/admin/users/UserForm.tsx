@@ -19,7 +19,7 @@ interface UserFormProps {
     onSaveAction: () => void;
     onBackAction: () => void;
     onCreateAccountAction: (currency: string) => void;
-    onAccountAction: (action: 'close' | 'delete', iban: string) => void;
+    onAccountAction: (action: 'toggle-status' | 'delete', iban: string) => void;
 }
 
 export const UserForm = ({
@@ -191,7 +191,7 @@ export const UserForm = ({
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        onClick={() => onAccountAction('close', account.iban)}
+                                                        onClick={() => onAccountAction('toggle-status', account.iban)}
                                                     >
                                                         {account.status === "ACTIVE" ? "Close" : "Open"}
                                                     </Button>
