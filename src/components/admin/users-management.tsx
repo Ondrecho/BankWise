@@ -1,3 +1,6 @@
+/*
+// users-management.tsx
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -14,8 +17,8 @@ import {
     openAccount,
     deleteAccount
 } from '@/services/users-service'
-import { UserList } from '@/components/admin/users/UserList'
-import { UserFormModal } from '@/components/admin/users/user-form-modal'
+import { UsersList } from '@/components/admin/users/UsersList'
+import { UserForm } from '@/components/admin/users/user-form-modal'
 import { AccountsManagement } from '@/components/admin/users/user-accounts'
 import { Button } from '@/components/ui/button'
 import { getRoles } from '@/services/roles-service'
@@ -161,7 +164,7 @@ export function UsersManagement() {
                 </Button>
             </div>
 
-            <UserList
+            <UsersList
                 users={users}
                 onEdit={(user) => {
                     setEditingUser(user)
@@ -171,7 +174,7 @@ export function UsersManagement() {
                 onViewAccounts={handleViewAccounts}
             />
 
-            <UserFormModal
+            <UserForm
                 open={isFormOpen}
                 onOpenChange={setIsFormOpen}
                 user={editingUser || undefined}
@@ -194,3 +197,4 @@ export function UsersManagement() {
         </div>
     )
 }
+*/

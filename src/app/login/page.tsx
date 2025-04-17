@@ -3,15 +3,15 @@
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {useRouter} from 'next/navigation';
-import {useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useToast} from "@/hooks/use-toast";
 import {Loader2} from "lucide-react";
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-    const {toast} = useToast();
-    const [isLoading, setIsLoading] = useState(false);
+  const {toast} = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

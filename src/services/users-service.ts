@@ -1,7 +1,36 @@
-import { User, Account } from "@/types";
+import {Account, User} from "@/types";
 
 const credentials = {token: "eyJhbGciOiJIUzI1NiJ9.eyJpc0FkbWluIjp0cnVlLCJzdWIiOiJhZG1pbkBiYW5rLmNvbSIsImlhdCI6MTc0NDU2MTE5NCwiZXhwIjoyNzQ0NTYxMTk0fQ.9kyYeryvDEJNIr7uBrgTrbkyG3-YbOcwbspZ1RgGXxM", email: "admin@bank.com"};
 
+export const UsersService = {
+    getMockUsers: (): User[] => [{
+        id: 1,
+        fullName: "John Doe",
+        email: "john@example.com",
+        dateOfBirth: "1990-01-01",
+        active: true,
+        roles: [{ id: 3, name: 'admin', description: 'Администратор' }],
+        accounts: [{
+            id: 1,
+            iban: "BY00OLMP31310000000000000001",
+            balance: 1000,
+            currency: "USD",
+            status: "ACTIVE",
+            createdAt: "2023-01-01",
+            userId: 1
+        }]
+    }],
+
+    generateAccount: (currency: string, userId: number): Account => ({
+        id: Date.now(),
+        iban: `BY00OLMP3131${Math.random().toString().slice(2, 16)}`,
+        balance: 0,
+        currency,
+        status: "ACTIVE",
+        createdAt: new Date().toISOString(),
+        userId
+    })
+};
 
 export async function getUsers(fullName?: string, roleName?: string, ): Promise<User[]> {
     let url = 'http://localhost:8080/api/admin/users';
@@ -34,8 +63,7 @@ export async function getUsers(fullName?: string, roleName?: string, ): Promise<
         throw error;
     }
 
-    const users = JSON.parse(responseBody);
-    return users;
+    return JSON.parse(responseBody);
 }
 
 export async function createUser(userData: {
