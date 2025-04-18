@@ -1,5 +1,5 @@
 'use client';
-import {Account, User} from '@/types';
+import { User} from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import CreateAccountModal from './CreateAccountModal';

@@ -14,13 +14,13 @@ body {
     --card-foreground: 222.2 84.9% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84.9% 4.9%;
-    --primary: 217 100% 47%; /* #007BFF in HSL */
+    --primary: 217 100% 47%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 210 9% 52%; /* #6C757D in HSL */
+    --secondary: 210 9% 62%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 4% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 145 76% 44%; /* #28A745 in HSL */
+    --accent: 145 76% 44%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
