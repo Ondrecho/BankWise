@@ -43,7 +43,7 @@ export const UserForm = ({
         <Card className="border-none shadow-sm">
             <CardHeader className="px-4 pt-4">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-xl font-semibold">
+                    <CardTitle className="text-2xl font-semibold">
                         {user.id === 0 ? "Create New User" : user.fullName}
                     </CardTitle>
                     <div className="hidden md:flex gap-2">

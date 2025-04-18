@@ -16,7 +16,6 @@ export default function UserDetailsPage() {
         availableRoles,
         handleCreateAccount,
         handleAccountAction,
-        handleLogout,
     } = useUsers();
 
     const { id } = useParams();
@@ -34,9 +33,6 @@ export default function UserDetailsPage() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
-            <DashboardHeader onLogoutAction={handleLogout} />
-            <main className="flex-1 p-6">
                 <UserForm
                     user={selectedUser}
                     roles={availableRoles}
@@ -52,7 +48,5 @@ export default function UserDetailsPage() {
                     onCreateAccountAction={handleCreateAccount}
                     onAccountAction={handleAccountAction}
                 />
-            </main>
-        </div>
     );
 }

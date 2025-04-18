@@ -23,17 +23,19 @@ export function UserAccounts({
         <div className="space-y-4">
             <div className="space-y-2 max-h-80 overflow-y-auto">
                 {user.accounts?.map(account => (
-                    <Card key={account.id} className="border p-0">
+                    <Card className="border p-0">
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="font-medium">{account.iban}</p>
-                                    <div className="flex items-center gap-2">
-                                        <Badge variant={account.status === 'ACTIVE' ? 'default' : 'destructive'}>
-                                            {account.status}
-                                        </Badge>
-                                        <span className="text-sm text-gray-500"> {account.currency} • {account.balance}</span>
-                                    </div>
+                                    <p className="text-sm text-gray-500">
+                                        {account.currency} • {account.balance}
+                                    </p>
+                                    <Badge
+                                        variant={account.status === "ACTIVE" ? "default" : "destructive"}
+                                    >
+                                        {account.status}
+                                    </Badge>
                                 </div>
                                 <div className="flex gap-2">
                                     <Button

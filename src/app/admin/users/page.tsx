@@ -1,7 +1,6 @@
 'use client';
 
 import { useUsers } from '@/features/admin-users/hooks/use-users';
-import { DashboardHeader } from '@/components/admin/DashboardHeader';
 import { Button } from '@/components/ui/button';
 import { UserList } from '@/features/admin-users/components/UserList';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -16,7 +15,6 @@ export default function UsersPage() {
         handleUserDelete,
         handleUserSelect,
         handleCreateUser,
-        handleLogout,
     } = useUsers();
 
     const router = useRouter();
@@ -27,14 +25,13 @@ export default function UsersPage() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
-            <DashboardHeader onLogoutAction={handleLogout} />
+        <div className="space-y-6">
             <main className="flex-1 p-6 space-y-6">
                 <div className="flex justify-between items-center">
                     <h1 className="text-2xl font-semibold">User Management</h1>
                     <Button onClick={handleCreateUser}>Create New User</Button>
                 </div>
-                <UserList users={users} onSelect={handleClick} onDelete={handleUserDelete} />
+                <UserList users={users} onSelect={handleClick} onDelete={handleUserDelete}/>
                 <ConfirmDialog
                     open={!!userToDelete}
                     title="Delete User"
