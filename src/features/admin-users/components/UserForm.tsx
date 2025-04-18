@@ -40,37 +40,9 @@ export const UserForm = ({
     }));
 
     return (
-        <Card className="border-none shadow-sm">
-            <CardHeader className="px-4 pt-4">
-                <div className="flex items-center justify-between">
-                    <CardTitle className="text-2xl font-semibold">
-                        {user.id === 0 ? "Create New User" : user.fullName}
-                    </CardTitle>
-                    <div className="hidden md:flex gap-2">
-                        <Button variant="outline" onClick={onBackAction}>Cancel</Button>
-                        <Button onClick={onSaveAction}>
-                            {user.id === 0 ? "Create User" : "Save Changes"}
-                        </Button>
-                    </div>
-                </div>
-            </CardHeader>
-            <CardContent className="px-4 py-6">
+        <Card className="border-none shadow-none">
+            <CardContent className="px-4">
                 <Tabs defaultValue="personal" className="w-full">
-                    <TabsList className="mb-4 flex gap-2 border-b border-gray-300 justify-start items-stretch h-12">
-                        <TabsTrigger
-                            value="personal"
-                            className="h-full m-0 flex items-center px-4 py-0 leading-none font-semibold text-gray-700 rounded-md transition-colors duration-200 hover:bg-gray-50 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
-                        >
-                            Personal Info
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="accounts"
-                            className="h-full m-0 flex items-center px-4 py-0 leading-none font-semibold text-gray-700 rounded-md transition-colors duration-200 hover:bg-gray-50 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
-                        >
-                            Bank Accounts
-                        </TabsTrigger>
-                    </TabsList>
-
                     <TabsContent value="personal">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
@@ -212,12 +184,6 @@ export const UserForm = ({
                     </TabsContent>
                 </Tabs>
             </CardContent>
-            <CardFooter className="flex justify-end gap-2 px-4 py-4 md:hidden">
-                <Button variant="outline" onClick={onBackAction}>Cancel</Button>
-                <Button onClick={onSaveAction}>
-                    {user.id === 0 ? "Create User" : "Save Changes"}
-                </Button>
-            </CardFooter>
 
             <CreateAccountModal
                 open={showCurrencyModal}

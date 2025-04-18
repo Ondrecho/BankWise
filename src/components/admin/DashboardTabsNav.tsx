@@ -1,70 +1,40 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChartIcon, FileTextIcon, ShieldIcon, UsersIcon } from '@/components/icons';
+import { UsersIcon, ShieldIcon, FileTextIcon, BarChartIcon } from '@/components/icons';
+import clsx from 'clsx';
 
-export function DashboardTabsNav() {
-    const router = useRouter();
+const items = [
+    { href: '/admin/users', label: 'Users', icon: UsersIcon },
+    { href: '/admin/roles', label: 'Roles', icon: ShieldIcon },
+    { href: '/admin/logs', label: 'Logs', icon: FileTextIcon },
+    { href: '/admin/stats', label: 'Stats', icon: BarChartIcon },
+];
+
+export const DashboardTabsNav = () => {
     const pathname = usePathname();
-
-    const tabMap: Record<string, string> = {
-        '/admin/users': 'users',
-        '/admin/roles': 'roles',
-        '/admin/logs': 'logs',
-        '/admin/stats': 'stats',
-    };
-
-    const current = Object.keys(tabMap).find(key => pathname.startsWith(key)) || '/admin/users';
+    const router = useRouter();
 
     return (
-        <div className="bg-white shadow-sm">
-            <div className="max-w mx-auto px-4">
-                <Tabs value={tabMap[current]} className="w-full">
-                    <TabsList className="h-auto w-full grid grid-cols-4 bg-transparent px-0 gap-1">
-                        <TabsTrigger
-                            value="users"
-                            onClick={() => router.push('/admin/users')}
-                            className="py-3 px-4 rounded-t-lg border-b-2 data-[state=active]:border-green-500 data-[state=active]:bg-transparent"
-                        >
-              <span className="flex items-center">
-                <UsersIcon className="h-4 w-4 mr-2" />
-                User Management
-              </span>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="roles"
-                            onClick={() => router.push('/admin/roles')}
-                            className="py-3 px-4 rounded-t-lg border-b-2 data-[state=active]:border-green-500 data-[state=active]:bg-transparent"
-                        >
-              <span className="flex items-center">
-                <ShieldIcon className="h-4 w-4 mr-2" />
-                Role Management
-              </span>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="logs"
-                            onClick={() => router.push('/admin/logs')}
-                            className="py-3 px-4 rounded-t-lg border-b-2 data-[state=active]:border-green-500 data-[state=active]:bg-transparent"
-                        >
-              <span className="flex items-center">
-                <FileTextIcon className="h-4 w-4 mr-2" />
-                Logs
-              </span>
-                        </TabsTrigger>
-                        <TabsTrigger
-                            value="stats"
-                            onClick={() => router.push('/admin/stats')}
-                            className="py-3 px-4 rounded-t-lg border-b-2 data-[state=active]:border-green-500 data-[state=active]:bg-transparent"
-                        >
-              <span className="flex items-center">
-                <BarChartIcon className="h-4 w-4 mr-2" />
-                Statistics
-              </span>
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
-            </div>
-        </div>
+        <aside className="w-20 bg-white border-r shadow-sm flex flex-col items-center py-4 space-y-6">
+            {items.map(({ href, label, icon: Icon }) => {
+                const isActive = pathname.startsWith(href);
+
+                return (
+                    <button
+                        key={href}
+                        onClick={() => router.push(href)}
+                        className={clsx(
+                            'flex flex-col items-center text-xs gap-1',
+                            'text-gray-500 hover:text-black transition-colors',
+                            isActive && 'text-green-600'
+                        )}
+                    >
+                        <Icon className="w-6 h-6" />
+                        <span>{label}</span>
+                    </button>
+                );
+            })}
+        </aside>
     );
-}
+};

@@ -23,7 +23,7 @@ export function UserAccounts({
         <div className="space-y-4">
             <div className="space-y-2 max-h-80 overflow-y-auto">
                 {user.accounts?.map(account => (
-                    <Card className="border p-0">
+                    <Card key={account.id} className="border p-0">
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
                                 <div>

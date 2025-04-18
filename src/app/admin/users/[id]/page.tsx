@@ -1,52 +1,15 @@
 'use client';
 
-import { useUsers } from '@/features/admin-users/hooks/use-users';
-import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { DashboardHeader } from '@/components/admin/DashboardHeader';
-import { UserForm } from '@/features/admin-users/components/UserForm';
+import { useRouter, useParams } from 'next/navigation';
 
-export default function UserDetailsPage() {
-    const {
-        users,
-        selectedUser,
-        setSelectedUser,
-        handleSaveUser,
-        handleBackToList,
-        availableRoles,
-        handleCreateAccount,
-        handleAccountAction,
-    } = useUsers();
-
-    const { id } = useParams();
+export default function UserRedirectPage() {
     const router = useRouter();
+    const { id } = useParams();
 
     useEffect(() => {
-        const user = users.find(u => u.id === Number(id));
-        if (user) {
-            setSelectedUser(user);
-        }
-    }, [id, users, setSelectedUser]);
+        router.replace(`/admin/users/${id}/info`);
+    }, [id, router]);
 
-    if (!selectedUser) {
-        return <div className="p-6">Loading...</div>;
-    }
-
-    return (
-                <UserForm
-                    user={selectedUser}
-                    roles={availableRoles}
-                    onChangeAction={setSelectedUser}
-                    onSaveAction={() => {
-                        handleSaveUser();
-                        router.push('/admin/users');
-                    }}
-                    onBackAction={() => {
-                        handleBackToList();
-                        router.push('/admin/users');
-                    }}
-                    onCreateAccountAction={handleCreateAccount}
-                    onAccountAction={handleAccountAction}
-                />
-    );
+    return null;
 }

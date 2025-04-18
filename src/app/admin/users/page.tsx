@@ -14,7 +14,6 @@ export default function UsersPage() {
         confirmUserDelete,
         handleUserDelete,
         handleUserSelect,
-        handleCreateUser,
     } = useUsers();
 
     const router = useRouter();
@@ -26,20 +25,18 @@ export default function UsersPage() {
 
     return (
         <div className="space-y-6">
-            <main className="flex-1 p-6 space-y-6">
-                <div className="flex justify-between items-center">
-                    <h1 className="text-2xl font-semibold">User Management</h1>
-                    <Button onClick={handleCreateUser}>Create New User</Button>
-                </div>
-                <UserList users={users} onSelect={handleClick} onDelete={handleUserDelete}/>
-                <ConfirmDialog
-                    open={!!userToDelete}
-                    title="Delete User"
-                    description={`Are you sure to delete ${userToDelete?.fullName}?`}
-                    onConfirm={confirmUserDelete}
-                    onCancel={() => setUserToDelete(null)}
-                />
-            </main>
+            <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-semibold">User Management</h1>
+                <Button onClick={() => router.push('/admin/users/new')}>Create New User</Button>
+            </div>
+            <UserList users={users} onSelect={(user) => router.push(`/admin/users/${user.id}`)} onDelete={handleUserDelete} />
+            <ConfirmDialog
+                open={!!userToDelete}
+                title="Delete User"
+                description={`Are you sure to delete ${userToDelete?.fullName}?`}
+                onConfirm={confirmUserDelete}
+                onCancel={() => setUserToDelete(null)}
+            />
         </div>
     );
 }

@@ -1,24 +1,21 @@
 'use client';
 
 import { useUsers } from '@/features/admin-users/hooks/use-users';
-import {useParams, useRouter} from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { UserAccounts } from '@/features/admin-users/components/UserAccounts';
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import {Button} from "@/components/ui/button";
-import Link from "next/link";
+import { Button } from '@/components/ui/button';
+import { UserForm } from '@/features/admin-users/components/UserForm';
+import Link from 'next/link';
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 
-export default function UserAccountsPage() {
+export default function UserInfoPage() {
     const {
         users,
         selectedUser,
         setSelectedUser,
-        handleCreateAccount,
-        handleAccountAction,
-        confirmAccountDelete,
-        accountToDelete,
-        setAccountToDelete,
+        handleSaveUser,
+        handleBackToList,
+        availableRoles,
     } = useUsers();
 
     const { id } = useParams();
@@ -26,12 +23,10 @@ export default function UserAccountsPage() {
 
     useEffect(() => {
         const user = users.find(u => u.id === Number(id));
-        if (user) {
-            setSelectedUser(user);
-        }
+        if (user) setSelectedUser(user);
     }, [id, users]);
 
-    if (!selectedUser) return <div className="p-6">Loading...</div>;
+    if (!selectedUser) return <div>Loading...</div>;
 
     return (
         <div className="space-y-6">
@@ -39,11 +34,16 @@ export default function UserAccountsPage() {
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">{selectedUser.fullName}</h2>
                 <div className="space-x-2">
-                    <Button variant="outline" onClick={() => router.push('/admin/users')}>Back</Button>
+                    <Button variant="outline" onClick={() => {
+                        handleBackToList();
+                        router.push('/admin/users');
+                    }}>Cancel</Button>
+                    <Button onClick={handleSaveUser}>Save Changes</Button>
                 </div>
             </div>
 
-            <Tabs defaultValue="accounts" className="w-full">
+            {/* Tab switches */}
+            <Tabs defaultValue="info" className="w-full">
                 <TabsList className="mb-4 flex gap-2 border-b border-gray-300 justify-start items-stretch h-12">
                     <TabsTrigger
                         value="info"
@@ -62,19 +62,17 @@ export default function UserAccountsPage() {
                 </TabsList>
             </Tabs>
 
-            <UserAccounts
+            {/* Actual form for Personal Info */}
+            <UserForm
                 user={selectedUser}
-                onCreateAccountAction={handleCreateAccount}
-                onAccountAction={handleAccountAction}
-            />
-
-            <ConfirmDialog
-                open={!!accountToDelete}
-                title="Delete Account"
-                description={`Delete account ${accountToDelete?.iban}?`}
-                onConfirm={confirmAccountDelete}
-                onCancel={() => setAccountToDelete(null)}
+                roles={availableRoles}
+                onChangeAction={setSelectedUser}
+                onSaveAction={handleSaveUser}
+                onBackAction={() => router.push('/admin/users')}
+                onCreateAccountAction={() => {}} // not used here
+                onAccountAction={() => {}}       // not used here
             />
         </div>
     );
 }
+
