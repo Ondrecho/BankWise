@@ -22,12 +22,12 @@ export interface MultiSelectOption {
     label: string;
 }
 
-const MAX_VISIBLE_BADGES = 3;
+const MAX_VISIBLE_BADGES = 2;
 
 interface MultiSelectProps {
     options: MultiSelectOption[];
     selected: MultiSelectOption[];
-    onChangeAction: (selected: MultiSelectOption[]) => void; // Переименование onChange
+    onChangeAction: (selected: MultiSelectOption[]) => void;
     placeholder?: string;
 }
 

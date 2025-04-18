@@ -2,12 +2,12 @@
 
 import { useUsers } from '@/features/admin-users/hooks/use-users';
 import {useParams, useRouter} from 'next/navigation';
-import { useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import { UserAccounts } from '@/features/admin-users/components/UserAccounts';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import {Button} from "@/components/ui/button";
-import Link from "next/link";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import CreateAccountModal from "@/features/admin-users/components/CreateAccountModal";
 
 export default function UserAccountsPage() {
     const {
@@ -17,12 +17,14 @@ export default function UserAccountsPage() {
         handleCreateAccount,
         handleAccountAction,
         confirmAccountDelete,
+        handleBackToList,
         accountToDelete,
         setAccountToDelete,
     } = useUsers();
 
     const { id } = useParams();
     const router = useRouter();
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const user = users.find(u => u.id === Number(id));
@@ -37,9 +39,13 @@ export default function UserAccountsPage() {
         <div className="space-y-6">
             {/* Top panel: title + actions */}
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold">{selectedUser.fullName}</h2>
+                <h2 className="text-2xl font-semibold">{selectedUser.fullName} accounts</h2>
                 <div className="space-x-2">
-                    <Button variant="outline" onClick={() => router.push('/admin/users')}>Back</Button>
+                    <Button variant="outline" onClick={() => {
+                        handleBackToList();
+                        router.push('/admin/users');
+                    }}>Back</Button>
+                    <Button onClick={() => setShowModal(true)}>Create Account</Button>
                 </div>
             </div>
 
@@ -74,6 +80,15 @@ export default function UserAccountsPage() {
                 description={`Delete account ${accountToDelete?.iban}?`}
                 onConfirm={confirmAccountDelete}
                 onCancel={() => setAccountToDelete(null)}
+            />
+
+            <CreateAccountModal
+                open={showModal}
+                onOpenChangeAction={setShowModal}
+                onCreateAction={(currency) => {
+                    handleCreateAccount(currency);
+                    setShowModal(false);
+                }}
             />
         </div>
     );

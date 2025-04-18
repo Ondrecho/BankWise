@@ -5,8 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserForm } from '@/features/admin-users/components/UserForm';
-import Link from 'next/link';
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {User} from "lucide-react";
 
 export default function UserInfoPage() {
     const {
@@ -28,6 +28,11 @@ export default function UserInfoPage() {
 
     if (!selectedUser) return <div>Loading...</div>;
 
+    const handleSave = async () => {
+        await handleSaveUser();
+        router.push('/admin/users');
+    };
+
     return (
         <div className="space-y-6">
             {/* Top panel: title + actions */}
@@ -38,7 +43,7 @@ export default function UserInfoPage() {
                         handleBackToList();
                         router.push('/admin/users');
                     }}>Cancel</Button>
-                    <Button onClick={handleSaveUser}>Save Changes</Button>
+                    <Button onClick={handleSave}>Save Changes</Button>
                 </div>
             </div>
 
@@ -63,15 +68,22 @@ export default function UserInfoPage() {
             </Tabs>
 
             {/* Actual form for Personal Info */}
-            <UserForm
-                user={selectedUser}
-                roles={availableRoles}
-                onChangeAction={setSelectedUser}
-                onSaveAction={handleSaveUser}
-                onBackAction={() => router.push('/admin/users')}
-                onCreateAccountAction={() => {}} // not used here
-                onAccountAction={() => {}}       // not used here
-            />
+            <div
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start"
+                style={{gridTemplateColumns: '75% 25%'}}
+            >
+                <UserForm
+                    user={selectedUser}
+                    roles={availableRoles}
+                    onChangeAction={setSelectedUser}
+                />
+                <div className="flex justify-center items-center">
+                    <div className="w-48 h-48 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-500">
+                        <User className="w-full h-full"/>
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 }

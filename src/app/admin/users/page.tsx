@@ -13,15 +13,9 @@ export default function UsersPage() {
         setUserToDelete,
         confirmUserDelete,
         handleUserDelete,
-        handleUserSelect,
     } = useUsers();
 
     const router = useRouter();
-
-    const handleClick = (user: any) => {
-        handleUserSelect(user);
-        router.push(`/admin/users/${user.id}`);
-    };
 
     return (
         <div className="space-y-6">

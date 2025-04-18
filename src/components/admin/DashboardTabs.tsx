@@ -114,10 +114,6 @@ export function DashboardTabs({
                             user={selectedUser}
                             roles={availableRoles}
                             onChangeAction={onUserChange}
-                            onSaveAction={onSaveUser}
-                            onBackAction={onBackToList}
-                            onCreateAccountAction={onCreateAccount}
-                            onAccountAction={onAccountAction}
                         />
                     )}
                     <ConfirmDialog

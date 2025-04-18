@@ -109,21 +109,20 @@ export function useUsers() {
         });
     };
 
-    const handleSaveUser = async () => {
-        if (!selectedUser) return;
+    const handleSaveUser = async (manualUser?: User) => {
+        const targetUser = manualUser ?? selectedUser;
+        if (!targetUser) return;
 
         try {
-            if (isCreating) {
-                // В будущем: await createUser(selectedUser);
+            if (isCreating || targetUser.id === 0) {
                 const newUser = {
-                    ...selectedUser,
-                    id: Math.max(...users.map(u => u.id)) + 1
+                    ...targetUser,
+                    id: Math.max(...users.map(u => u.id)) + 1,
                 };
                 setUsers(prev => [...prev, newUser]);
                 toast({ title: "User created successfully" });
             } else {
-                // В будущем: await updateUser(selectedUser.id, selectedUser);
-                setUsers(prev => prev.map(u => u.id === selectedUser.id ? selectedUser : u));
+                setUsers(prev => prev.map(u => u.id === targetUser.id ? targetUser : u));
                 toast({ title: "User updated successfully" });
             }
             handleBackToList();
@@ -131,10 +130,11 @@ export function useUsers() {
             toast({
                 title: "Error",
                 description: err instanceof Error ? err.message : "Failed to save user",
-                variant: "destructive"
+                variant: "destructive",
             });
         }
     };
+
 
     const handleCreateAccount = (currency: string) => {
         if (!selectedUser) return;
