@@ -16,7 +16,7 @@ export const DashboardTabsNav = () => {
     const router = useRouter();
 
     return (
-        <aside className="w-20 bg-white border-r shadow-sm flex flex-col items-center py-4 space-y-6">
+        <aside className="w-20 bg-white border-r shadow-sm flex flex-col items-center pt-24 pb-4 space-y-6">
             {items.map(({ href, label, icon: Icon }) => {
                 const isActive = pathname.startsWith(href);
 
@@ -27,7 +27,7 @@ export const DashboardTabsNav = () => {
                         className={clsx(
                             'flex flex-col items-center text-xs gap-1',
                             'text-gray-500 hover:text-black transition-colors',
-                            isActive && 'text-green-600'
+                            isActive && 'text-green-500'
                         )}
                     >
                         <Icon className="w-6 h-6" />
