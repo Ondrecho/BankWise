@@ -1,7 +1,7 @@
 'use client';
 import { DashboardHeader } from '@/components/admin/DashboardHeader';
 import { DashboardTabs } from '@/components/admin/DashboardTabs';
-import { useUsers } from '@/hooks/use-users';
+import { useUsers } from '@/features/admin-users/hooks/use-users';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 

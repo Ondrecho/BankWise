@@ -4,7 +4,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Account, Role, User} from "@/types";
 import {Button} from "@/components/ui/button";
 import {UserList} from "@/features/admin-users/components/UserList";
-import {UserForm} from "@/components/admin/users/UserForm";
+import {UserForm} from "@/features/admin-users/components/UserForm";
 import {ConfirmDialog} from "@/components/shared/ConfirmDialog";
 
 interface DashboardTabsProps {

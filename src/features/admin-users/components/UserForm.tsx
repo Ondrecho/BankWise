@@ -9,7 +9,7 @@ import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Badge} from "@/components/ui/badge";
-import CreateAccountModal from "@/components/admin/users/CreateAccountModal";
+import CreateAccountModal from "@/features/admin-users/components/CreateAccountModal";
 
 
 interface UserFormProps {
