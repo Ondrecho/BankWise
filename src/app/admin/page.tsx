@@ -25,7 +25,8 @@ export default function AdminDashboard() {
     handleAccountAction,
     confirmAccountDelete,
     setAccountToDelete,
-    setSelectedUser
+    setSelectedUser,
+    setUserToDelete
   } = useUsers();
 
   return (
@@ -38,16 +39,17 @@ export default function AdminDashboard() {
               availableRoles={availableRoles}
               userToDelete={userToDelete}
               accountToDelete={accountToDelete}
+              setUserToDelete={setUserToDelete}
+              confirmUserDelete={confirmUserDelete}
+              setAccountToDelete={setAccountToDelete}
+              confirmAccountDelete={confirmAccountDelete}
               onUserSelect={handleUserSelect}
               onUserDelete={handleUserDelete}
-              onConfirmUserDelete={confirmUserDelete}
               onCreateUser={handleCreateUser}
               onSaveUser={handleSaveUser}
               onBackToList={handleBackToList}
               onCreateAccount={handleCreateAccount}
               onAccountAction={handleAccountAction}
-              onConfirmAccountDelete={confirmAccountDelete}
-              onSetAccountToDelete={setAccountToDelete}
               onUserChange={setSelectedUser}
           />
         </main>

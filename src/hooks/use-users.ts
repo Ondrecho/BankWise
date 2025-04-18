@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { User, Account, Role } from '@/types';
-import { getUsers, createUser, updateUser, deleteUser } from '@/services/users-service';
+//import { getUsers, createUser, updateUser, deleteUser } from '@/services/users-service';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
@@ -258,9 +258,10 @@ export function useUsers() {
         handleAccountAction,
         confirmAccountDelete,
         setAccountToDelete,
+        setUserToDelete,
         handleLogout,
 
-        // API methods (for future use)
+/*        // API methods (for future use)
         fetchUsers,
         addUser: async (user: Omit<User, 'id'> & { password: string }) => {
             try {
@@ -288,6 +289,6 @@ export function useUsers() {
             } catch (err) {
                 return false;
             }
-        }
+        }*/
     };
 }

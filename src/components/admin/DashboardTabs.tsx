@@ -3,27 +3,32 @@ import {BarChartIcon, FileTextIcon, ShieldIcon, UsersIcon} from "@/components/ic
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Account, Role, User} from "@/types";
 import {Button} from "@/components/ui/button";
-import {UserList} from "@/components/admin/users/UsersList";
+import {UserList} from "@/features/admin-users/components/UserList";
 import {UserForm} from "@/components/admin/users/UserForm";
-import {DeleteAccountDialog, DeleteUserDialog} from "@/components/admin/users/DeleteDialogs";
+import {ConfirmDialog} from "@/components/shared/ConfirmDialog";
 
 interface DashboardTabsProps {
     users: User[];
     selectedUser: User | null;
     availableRoles: Role[];
+
     userToDelete: User | null;
+    setUserToDelete: (user: User | null) => void;
+    confirmUserDelete: () => void;
+
     accountToDelete: Account | null;
+    setAccountToDelete: (account: Account | null) => void;
+    confirmAccountDelete: () => void;
+    onAccountAction: (action: 'toggle-status' | 'delete', iban: string) => void;
+
     onUserSelect: (user: User) => void;
-    onUserDelete: (user: User | null) => void;
-    onConfirmUserDelete: () => void;
+    onUserDelete: (user: User) => void;
     onCreateUser: () => void;
     onSaveUser: () => void;
     onBackToList: () => void;
-    onCreateAccount: (currency: string) => void;
-    onAccountAction: (action: 'toggle-status' | 'delete', iban: string) => void;
-    onConfirmAccountDelete: () => void;
-    onSetAccountToDelete: (account: Account | null) => void;
     onUserChange: (user: User) => void;
+
+    onCreateAccount: (currency: string) => void;
 }
 
 export function DashboardTabs({
@@ -32,17 +37,18 @@ export function DashboardTabs({
                                   availableRoles,
                                   userToDelete,
                                   accountToDelete,
+                                  setUserToDelete,
+                                  confirmUserDelete,
+                                  setAccountToDelete,
+                                  confirmAccountDelete,
+                                  onAccountAction,
                                   onUserSelect,
                                   onUserDelete,
-                                  onConfirmUserDelete,
                                   onCreateUser,
                                   onSaveUser,
                                   onBackToList,
-                                  onCreateAccount,
-                                  onAccountAction,
-                                  onConfirmAccountDelete,
-                                  onSetAccountToDelete,
-                                  onUserChange
+                                  onUserChange,
+                                  onCreateAccount
                               }: DashboardTabsProps)  {
     return (
     <Card className="overflow-hidden border-none shadow-none">
@@ -98,8 +104,8 @@ export function DashboardTabs({
                             <CardContent className="px-0">
                                 <UserList
                                     users={users}
-                                    onSelectAction={onUserSelect}
-                                    onDeleteAction={onUserDelete}
+                                    onSelect={onUserSelect}
+                                    onDelete={onUserDelete}
                                 />
                             </CardContent>
                         </Card>
@@ -114,18 +120,20 @@ export function DashboardTabs({
                             onAccountAction={onAccountAction}
                         />
                     )}
-                    <DeleteUserDialog
-                        user={userToDelete}
+                    <ConfirmDialog
                         open={!!userToDelete}
-                        onConfirmAction={onConfirmUserDelete}
-                        onCancelAction={() => onUserDelete(null)}
+                        title="Delete User"
+                        description={`Are you sure to delete ${userToDelete?.fullName}?`}
+                        onConfirm={confirmUserDelete}
+                        onCancel={() => setUserToDelete(null)}
                     />
 
-                    <DeleteAccountDialog
-                        account={accountToDelete}
+                    <ConfirmDialog
                         open={!!accountToDelete}
-                        onConfirmAction={onConfirmAccountDelete}
-                        onCancelAction={() => onSetAccountToDelete(null)}
+                        title="Delete Account"
+                        description={`Delete account ${accountToDelete?.iban}?`}
+                        onConfirm={confirmAccountDelete}
+                        onCancel={() => setAccountToDelete(null)}
                     />
                 </TabsContent>
                 <TabsContent value="roles" className="mt-0">
