@@ -8,6 +8,10 @@ import { UserList } from '@/features/admin-users/components/UserList';
 import { Button } from '@/components/ui/button';
 import {useAuth} from "@/context/auth-context";
 import {ChevronLeftIcon, ChevronRightIcon} from "lucide-react";
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import {User} from "@/types";
+
+
 
 export default function UsersPage() {
     const [page, setPage] = useState(0);
@@ -16,12 +20,20 @@ export default function UsersPage() {
     const deleteMutation = useDeleteUser();
     const router = useRouter();
     const auth = useAuth();
+    const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
     if (isLoading) return <div className="p-6 text-gray-500">Loading users...</div>;
     if (isError || !data) return <div className="p-6 text-red-600">Failed to load users.</div>;
 
-    const handleDelete = (user: { id: number }) => {
-        deleteMutation.mutate(user.id);
+    const handleDelete = (user: User) => {
+        setUserToDelete(user);
+    };
+
+    const confirmDelete = () => {
+        if (userToDelete) {
+            deleteMutation.mutate(userToDelete.id);
+            setUserToDelete(null);
+        }
     };
 
     const handleSelect = (user: { id: number }) => {
@@ -41,6 +53,14 @@ export default function UsersPage() {
                     onSelect={handleSelect}
                     onDelete={handleDelete}
                     currentEmail={auth.currentEmail}
+                />
+
+                <ConfirmDialog
+                    open={!!userToDelete}
+                    title="Delete User"
+                    description={`Are you sure you want to delete ${userToDelete?.fullName}?`}
+                    onConfirm={confirmDelete}
+                    onCancel={() => setUserToDelete(null)}
                 />
             </div>
 

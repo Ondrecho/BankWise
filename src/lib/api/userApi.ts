@@ -1,14 +1,5 @@
 import { fetchWithAuth } from '@/lib/api/fetcher';
-
-export interface User {
-    id: number;
-    fullName: string;
-    email: string;
-    dateOfBirth: string;
-    active: boolean;
-    roles: { id: number; name: string }[];
-    accounts: any[];
-}
+import {User} from "@/types";
 
 export interface PaginatedResponse<T> {
     content: T[];
@@ -28,6 +19,23 @@ export async function fetchUsers(page = 0, size = 10): Promise<PaginatedResponse
         throw new Error('Failed to load users');
     }
 
+    return res.json();
+}
+
+export async function fetchUserById(id: number): Promise<User> {
+    const res = await fetchWithAuth(`http://localhost:8080/api/admin/users/${id}`);
+    if (!res.ok) throw new Error('Failed to load user');
+    return res.json();
+}
+
+export async function updateUser(user: User): Promise<User> {
+    const res = await fetchWithAuth(`http://localhost:8080/api/admin/users/${user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user),
+    });
+
+    if (!res.ok) throw new Error('Failed to update user');
     return res.json();
 }
 

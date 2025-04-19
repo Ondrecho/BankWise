@@ -16,8 +16,8 @@ export const DashboardTabsNav = () => {
     const router = useRouter();
 
     return (
-        <aside className="w-20 h-screen fixed left-0 top-16 bg-white border-r shadow-sm pt-4 z-20">
-            <div className="flex flex-col items-centerjustify-start h-full gap-6 mt-8">
+        <aside className="w-20 h-screen fixed left-0 bg-white border-r shadow-sm pt-4 z-20">
+            <div className="flex flex-col items-center justify-start h-full gap-8 mt-24">
                 {items.map(({href, label, icon: Icon}) => {
                     const isActive = pathname.startsWith(href);
 

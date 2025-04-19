@@ -1,9 +1,10 @@
 // src/features/admin-users/components/UserList.tsx
 'use client';
-import { User, Account, Role } from '@/types';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DataTable, DataTableColumn } from '@/components/shared/DataTable';
+import {User} from "@/types";
 
 export const UserList = ({
                              users,
@@ -49,23 +50,25 @@ export const UserList = ({
     ];
 
     return (
-        <DataTable<User>
-            data={users}
-            columns={columns}
-            onRowClick={onSelect}
-            actions={(user) => (
-                <Button
-                    variant="destructive"
-                    size="sm"
-                    disabled={user.email === currentEmail}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(user);
-                    }}
-                >
-                    Delete
-                </Button>
-            )}
-        />
+        <div className="overflow-y-auto max-h-[500px]">
+            <DataTable<User>
+                data={users}
+                columns={columns}
+                onRowClick={onSelect}
+                actions={(user) => (
+                    <Button
+                        variant="destructive"
+                        size="sm"
+                        disabled={user.email === currentEmail}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(user);
+                        }}
+                    >
+                        Delete
+                    </Button>
+                )}
+            />
+        </div>
     );
 };

@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { UserForm } from '@/features/admin-users/components/UserForm';
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {User as UserAvatar, User} from "lucide-react";
+import {useUserById} from "@/features/admin-users/hooks/useUserById";
+import {useUpdateUser} from "@/features/admin-users/hooks/useUpdateUser";
 
 export default function UserInfoPage() {
     const {
@@ -20,19 +22,23 @@ export default function UserInfoPage() {
 
     const { id } = useParams();
     const router = useRouter();
+    const { data: fetchedUser, isLoading } = useUserById(Number(id));
+    const updateMutation = useUpdateUser();
 
     useEffect(() => {
-        const user = users.find(u => u.id === Number(id));
-        if (user) setSelectedUser(user);
-    }, [id, users]);
+        if (fetchedUser && typeof fetchedUser === 'object') {
+            setSelectedUser(fetchedUser);
+        }
+    }, [fetchedUser]);
 
     if (!selectedUser) return <div>Loading...</div>;
 
     const handleSave = async () => {
-        await handleSaveUser();
-        router.push('/admin/users');
+        if (selectedUser) {
+            await updateMutation.mutateAsync(selectedUser);
+            router.push('/admin/users');
+        }
     };
-
     return (
         <div className="space-y-6">
             {/* Top panel: title + actions */}
