@@ -50,7 +50,6 @@ export const UserList = ({
     ];
 
     return (
-        <div className="overflow-y-auto max-h-[500px]">
             <DataTable<User>
                 data={users}
                 columns={columns}
@@ -69,6 +68,5 @@ export const UserList = ({
                     </Button>
                 )}
             />
-        </div>
     );
 };

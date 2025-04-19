@@ -12,10 +12,8 @@ import {useUpdateUser} from "@/features/admin-users/hooks/useUpdateUser";
 
 export default function UserInfoPage() {
     const {
-        users,
         selectedUser,
         setSelectedUser,
-        handleSaveUser,
         handleBackToList,
         availableRoles,
     } = useUsers();
@@ -41,12 +39,10 @@ export default function UserInfoPage() {
     };
     return (
         <div className="space-y-6">
-            {/* Top panel: title + actions */}
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">{selectedUser.fullName}</h2>
             </div>
 
-            {/* Tab switches */}
             <Tabs defaultValue="info" className="w-full">
                 <TabsList className="mb-4 flex gap-2 border-b border-gray-300 justify-start items-stretch h-12">
                     <TabsTrigger

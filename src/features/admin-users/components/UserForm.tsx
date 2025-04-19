@@ -3,7 +3,6 @@
 import { User, Role } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Card, CardContent } from '@/components/ui/card';
 import {Button} from "@/components/ui/button";
@@ -12,44 +11,59 @@ interface UserFormProps {
     user: User;
     roles: Role[];
     onChangeAction: (user: User) => void;
+    password?: string;
+    onPasswordChange?: (password: string) => void;
+
 }
 
 export const UserForm = ({
                              user,
                              roles,
                              onChangeAction,
+                             password,
+                             onPasswordChange
                          }: UserFormProps) => {
-    const roleOptions = roles.map(role => ({
-        value: role.id.toString(),
-        label: role.description || role.name,
+    const roleOptions = roles.map((role) => ({
+        value: role.name,
+        label: role.name.replace('ROLE_', '').replaceAll('_', ' '),
     }));
 
     return (
         <Card className="border-none shadow-none">
             <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="fullName">Full Name</Label>
                             <Input
                                 id="fullName"
                                 value={user.fullName}
-                                onChange={(e) =>
-                                    onChangeAction({ ...user, fullName: e.target.value })
-                                }
+                                onChange={(e) => onChangeAction({ ...user, fullName: e.target.value })}
                             />
                         </div>
+
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
                                 id="email"
                                 type="email"
                                 value={user.email}
-                                onChange={(e) =>
-                                    onChangeAction({ ...user, email: e.target.value })
-                                }
+                                onChange={(e) => onChangeAction({ ...user, email: e.target.value })}
                             />
                         </div>
+
+                        {!user.id && onPasswordChange && (
+                            <div className="space-y-2">
+                                <Label htmlFor="password">Password</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => onPasswordChange(e.target.value)}
+                                />
+                            </div>
+                        )}
+
                         <div className="space-y-2">
                             <Label htmlFor="dateOfBirth">Date of Birth</Label>
                             <Input
@@ -69,28 +83,25 @@ export const UserForm = ({
                             <Button
                                 variant={user.active ? 'default' : 'destructive'}
                                 className="w-full"
-                                onClick={() => onChangeAction({...user, active: !user.active})}
+                                onClick={() => onChangeAction({ ...user, active: !user.active })}
                             >
-                                {user.active
-                                    ? 'Active'
-                                    : 'Blocked'}
+                                {user.active ? 'Active' : 'Blocked'}
                             </Button>
                         </div>
+
                         <div className="space-y-2">
                             <Label htmlFor="roles">Roles</Label>
                             <MultiSelect
                                 options={roleOptions}
-                                selected={
-                                    user.roles?.map(role => ({
-                                        value: role.id.toString(),
-                                        label: role.description || role.name,
-                                    })) || []
-                                }
+                                selected={user.roles?.map((r) => ({
+                                    value: r.name,
+                                    label: r.name.replace('ROLE_', '').replaceAll('_', ' '),
+                                })) || []}
                                 onChangeAction={(selected) => {
-                                    const selectedRoles = roles.filter(role =>
-                                        selected.some(s => s.value === role.id.toString())
+                                    const selectedRoles = roles.filter((role) =>
+                                        selected.some((s) => s.value === role.name)
                                     );
-                                    onChangeAction({...user, roles: selectedRoles});
+                                    onChangeAction({ ...user, roles: selectedRoles });
                                 }}
                                 placeholder="Select roles..."
                             />

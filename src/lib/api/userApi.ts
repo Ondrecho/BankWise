@@ -39,6 +39,21 @@ export async function updateUser(user: User): Promise<User> {
     return res.json();
 }
 
+export async function createUser(user: User & { password: string }) {
+    const res = await fetchWithAuth(`http://localhost:8080/api/admin/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            ...user,
+            roles: user.roles.map((r) => ({ name: r.name })),
+        }),
+    });
+
+    if (!res.ok) throw new Error('Failed to create user');
+    return res.json();
+}
+
+
 export async function deleteUser(id: number) {
     const res = await fetchWithAuth(`http://localhost:8080/api/users/${id}`, {
         method: 'DELETE',
