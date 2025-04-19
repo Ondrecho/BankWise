@@ -32,8 +32,8 @@ export default function UsersPage() {
                 <Button onClick={() => router.push('/admin/users/new')}>Create New User</Button>
             </div>
 
-            <div className="bg-white border rounded-xl p-4 shadow-sm overflow-x-auto">
-                <UserList users={data.content} onSelect={handleSelect} onDelete={handleDelete} />
+            <div className="bg-white border rounded-xl p-4 shadow-sm max-h-[600px] overflow-y-auto">
+                <UserList users={data.content} onSelect={handleSelect} onDelete={handleDelete}/>
             </div>
 
             <div className="flex justify-between items-center pt-4">

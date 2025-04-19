@@ -18,8 +18,8 @@ interface DataTableProps<T> {
 
 export function DataTable<T>({ data, columns, onRowClick, actions }: DataTableProps<T>) {
     return (
-        <Table>
-            <TableHeader>
+        <Table className="min-w-full">
+            <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
                 <TableRow>
                     {columns.map((column) => (
                         <TableHead key={String(column.accessor)}>{column.header}</TableHead>
