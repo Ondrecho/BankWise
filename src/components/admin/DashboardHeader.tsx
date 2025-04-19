@@ -7,7 +7,7 @@ export const DashboardHeader = () => {
     const {logout} = useAuth();
     const router = useRouter();
     return (
-        <header className="sticky top-0 z-10 bg-white shadow-sm">
+        <header className="sticky top-0 z-20 bg-white shadow-sm">
             <div className="container flex items-center justify-between h-16 px-4 mx-auto">
                 <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
                 <Button

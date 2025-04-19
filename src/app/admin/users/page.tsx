@@ -25,11 +25,16 @@ export default function UsersPage() {
                 <Button onClick={() => router.push('/admin/users/new')}>Create New User</Button>
             </div>
 
-            <ul className="border rounded-lg divide-y bg-white shadow-sm">
+            {/* Table container with scroll */}
+            <div className="border rounded-lg overflow-y-auto max-h-[600px] bg-white shadow-sm">
+                <div className="sticky top-0 bg-white z-10 border-b p-4 flex justify-between font-semibold text-sm text-gray-600">
+                    <span>User</span>
+                    <span>Roles</span>
+                </div>
                 {data.content.map((user) => (
-                    <li
+                    <div
                         key={user.id}
-                        className="p-4 flex justify-between items-center hover:bg-gray-50 cursor-pointer"
+                        className="p-4 flex justify-between items-center hover:bg-gray-50 cursor-pointer border-b"
                         onClick={() => handleSelectUser(user.id)}
                     >
                         <div>
@@ -37,10 +42,11 @@ export default function UsersPage() {
                             <p className="text-sm text-gray-500">{user.email}</p>
                         </div>
                         <span className="text-sm text-gray-600">{user.roles.map((r) => r.name).join(', ')}</span>
-                    </li>
+                    </div>
                 ))}
-            </ul>
+            </div>
 
+            {/* Pagination */}
             <div className="flex justify-between items-center pt-4">
                 <Button variant="outline" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
                     Previous
