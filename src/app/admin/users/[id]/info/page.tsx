@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserForm } from '@/features/admin-users/components/UserForm';
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {User} from "lucide-react";
+import {User as UserAvatar, User} from "lucide-react";
 
 export default function UserInfoPage() {
     const {
@@ -38,13 +38,6 @@ export default function UserInfoPage() {
             {/* Top panel: title + actions */}
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-semibold">{selectedUser.fullName}</h2>
-                <div className="space-x-2">
-                    <Button variant="outline" onClick={() => {
-                        handleBackToList();
-                        router.push('/admin/users');
-                    }}>Cancel</Button>
-                    <Button onClick={handleSave}>Save Changes</Button>
-                </div>
             </div>
 
             {/* Tab switches */}
@@ -67,16 +60,23 @@ export default function UserInfoPage() {
                 </TabsList>
             </Tabs>
 
-            {/* Actual form for Personal Info */}
             <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] items-start">
                 <UserForm
                     user={selectedUser}
                     roles={availableRoles}
                     onChangeAction={setSelectedUser}
                 />
-                <div className="flex justify-center items-center">
-                    <div className="w-48 h-48 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-500">
-                        <User className="w-full h-full"/>
+                <div className="flex flex-col items-center justify-between h-full">
+                    <div
+                        className="w-48 h-48 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-500 mb-4">
+                        <UserAvatar className="w-full h-full"/>
+                    </div>
+                    <div className="space-x-2">
+                        <Button variant="outline" onClick={() => {
+                            handleBackToList();
+                            router.push('/admin/users');
+                        }}>Cancel</Button>
+                        <Button onClick={handleSave}>Save Changes</Button>
                     </div>
                 </div>
             </div>
