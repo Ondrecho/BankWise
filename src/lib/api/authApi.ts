@@ -30,7 +30,11 @@ export async function registerUser(input: {
         body: JSON.stringify(input),
     });
 
-    const data = await res.json();
+    if (res.status === 201) {
+        return {};
+    }
+
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
         const message = data?.error || 'Registration failed';
