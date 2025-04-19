@@ -30,3 +30,15 @@ export async function fetchUsers(page = 0, size = 10): Promise<PaginatedResponse
 
     return res.json();
 }
+
+export async function deleteUser(id: number) {
+    const res = await fetchWithAuth(`http://localhost:8080/api/users/${id}`, {
+        method: 'DELETE',
+    });
+
+    if (!res.ok) {
+        throw new Error('Failed to delete user');
+    }
+
+    return true;
+}

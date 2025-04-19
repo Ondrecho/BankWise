@@ -1,22 +1,29 @@
 'use client';
 
 import { useUsersQuery } from '@/features/admin-users/hooks/useUsersQuery';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useDeleteUser } from '@/features/admin-users/hooks/useDeleteUser';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { UserList } from '@/features/admin-users/components/UserList';
+import { Button } from '@/components/ui/button';
 
 export default function UsersPage() {
     const [page, setPage] = useState(0);
     const size = 10;
     const { data, isLoading, isError } = useUsersQuery(page, size);
+    const deleteMutation = useDeleteUser();
     const router = useRouter();
-
-    const handleSelectUser = (id: number) => {
-        router.push(`/admin/users/${id}/info`);
-    };
 
     if (isLoading) return <div className="p-6 text-gray-500">Loading users...</div>;
     if (isError || !data) return <div className="p-6 text-red-600">Failed to load users.</div>;
+
+    const handleDelete = (user: { id: number }) => {
+        deleteMutation.mutate(user.id);
+    };
+
+    const handleSelect = (user: { id: number }) => {
+        router.push(`/admin/users/${user.id}/info`);
+    };
 
     return (
         <div className="space-y-6">
@@ -25,28 +32,10 @@ export default function UsersPage() {
                 <Button onClick={() => router.push('/admin/users/new')}>Create New User</Button>
             </div>
 
-            {/* Table container with scroll */}
-            <div className="border rounded-lg overflow-y-auto max-h-[600px] bg-white shadow-sm">
-                <div className="sticky top-0 bg-white z-10 border-b p-4 flex justify-between font-semibold text-sm text-gray-600">
-                    <span>User</span>
-                    <span>Roles</span>
-                </div>
-                {data.content.map((user) => (
-                    <div
-                        key={user.id}
-                        className="p-4 flex justify-between items-center hover:bg-gray-50 cursor-pointer border-b"
-                        onClick={() => handleSelectUser(user.id)}
-                    >
-                        <div>
-                            <p className="font-medium">{user.fullName}</p>
-                            <p className="text-sm text-gray-500">{user.email}</p>
-                        </div>
-                        <span className="text-sm text-gray-600">{user.roles.map((r) => r.name).join(', ')}</span>
-                    </div>
-                ))}
+            <div className="bg-white border rounded-xl p-4 shadow-sm overflow-x-auto">
+                <UserList users={data.content} onSelect={handleSelect} onDelete={handleDelete} />
             </div>
 
-            {/* Pagination */}
             <div className="flex justify-between items-center pt-4">
                 <Button variant="outline" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
                     Previous
