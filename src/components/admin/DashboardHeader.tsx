@@ -8,8 +8,8 @@ export const DashboardHeader = () => {
     const router = useRouter();
     return (
         <header className="sticky top-0 z-20 bg-white shadow-sm">
-            <div className="container flex items-center justify-between h-16 px-4 mx-auto">
-                <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+            <div className="container flex items-center justify-between h-16 px-24 mx-auto">
+                <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
                 <Button
                     variant="outline"
                     onClick={() => {

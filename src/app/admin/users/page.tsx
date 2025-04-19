@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { UserList } from '@/features/admin-users/components/UserList';
 import { Button } from '@/components/ui/button';
 import {useAuth} from "@/context/auth-context";
+import {ChevronLeftIcon, ChevronRightIcon} from "lucide-react";
 
 export default function UsersPage() {
     const [page, setPage] = useState(0);
@@ -43,17 +44,32 @@ export default function UsersPage() {
                 />
             </div>
 
-            <div className="flex justify-between items-center pt-4">
-                <Button variant="outline" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-                    Previous
-                </Button>
+            <div className="flex items-center justify-center gap-4 pt-4">
+                {/* Левая стрелка */}
+                <button
+                    className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
+                    disabled={page === 0}
+                    onClick={() => setPage((p) => p - 1)}
+                >
+                    <ChevronLeftIcon className="w-4 h-4 text-gray-600" />
+                </button>
+
+                {/* Текст с номером страницы */}
                 <span className="text-sm text-gray-600">
-          Page {data.number + 1} of {data.totalPages}
-        </span>
-                <Button variant="outline" disabled={data.last} onClick={() => setPage((p) => p + 1)}>
-                    Next
-                </Button>
+    Page {data.number + 1} of {data.totalPages}
+  </span>
+
+                {/* Правая стрелка */}
+                <button
+                    className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
+                    disabled={data.last}
+                    onClick={() => setPage((p) => p + 1)}
+                >
+                    <ChevronRightIcon className="w-4 h-4 text-gray-600" />
+                </button>
             </div>
+
+
         </div>
     );
 }
