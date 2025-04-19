@@ -9,10 +9,12 @@ export const UserList = ({
                              users,
                              onSelect,
                              onDelete,
+                             currentEmail,
                          }: {
     users: User[];
     onSelect: (user: User) => void;
     onDelete: (user: User) => void;
+    currentEmail?: string | null;
 }) => {
     const columns: DataTableColumn<User>[] = [
         {
@@ -55,6 +57,7 @@ export const UserList = ({
                 <Button
                     variant="destructive"
                     size="sm"
+                    disabled={user.email === currentEmail}
                     onClick={(e) => {
                         e.stopPropagation();
                         onDelete(user);

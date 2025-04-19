@@ -24,7 +24,7 @@ export default function LoginForm() {
             { email, password },
             {
                 onSuccess: (data) => {
-                    login(data.token, data.isAdmin);
+                    login(data.token, data.isAdmin, email);
                     toast({
                         title: 'Login successful',
                         description: 'Redirecting...',

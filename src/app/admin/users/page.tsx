@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { UserList } from '@/features/admin-users/components/UserList';
 import { Button } from '@/components/ui/button';
+import {useAuth} from "@/context/auth-context";
 
 export default function UsersPage() {
     const [page, setPage] = useState(0);
@@ -13,6 +14,7 @@ export default function UsersPage() {
     const { data, isLoading, isError } = useUsersQuery(page, size);
     const deleteMutation = useDeleteUser();
     const router = useRouter();
+    const auth = useAuth();
 
     if (isLoading) return <div className="p-6 text-gray-500">Loading users...</div>;
     if (isError || !data) return <div className="p-6 text-red-600">Failed to load users.</div>;
@@ -33,7 +35,12 @@ export default function UsersPage() {
             </div>
 
             <div className="bg-white border rounded-xl p-4 shadow-sm max-h-[600px] overflow-y-auto">
-                <UserList users={data.content} onSelect={handleSelect} onDelete={handleDelete}/>
+                <UserList
+                    users={data.content}
+                    onSelect={handleSelect}
+                    onDelete={handleDelete}
+                    currentEmail={auth.currentEmail}
+                />
             </div>
 
             <div className="flex justify-between items-center pt-4">
