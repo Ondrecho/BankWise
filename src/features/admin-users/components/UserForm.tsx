@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Card, CardContent } from '@/components/ui/card';
+import {Button} from "@/components/ui/button";
 
 interface UserFormProps {
     user: User;
@@ -25,8 +26,8 @@ export const UserForm = ({
 
     return (
         <Card className="border-none shadow-none">
-            <CardContent className="px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="fullName">Full Name</Label>
@@ -65,20 +66,15 @@ export const UserForm = ({
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="status">Status</Label>
-                            <Select
-                                value={user.active ? 'active' : 'blocked'}
-                                onValueChange={(value) =>
-                                    onChangeAction({ ...user, active: value === 'active' })
-                                }
+                            <Button
+                                variant={user.active ? 'default' : 'destructive'}
+                                className="w-full"
+                                onClick={() => onChangeAction({...user, active: !user.active})}
                             >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="active">Active</SelectItem>
-                                    <SelectItem value="blocked">Blocked</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                {user.active
+                                    ? 'Active'
+                                    : 'Blocked'}
+                            </Button>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="roles">Roles</Label>
@@ -94,7 +90,7 @@ export const UserForm = ({
                                     const selectedRoles = roles.filter(role =>
                                         selected.some(s => s.value === role.id.toString())
                                     );
-                                    onChangeAction({ ...user, roles: selectedRoles });
+                                    onChangeAction({...user, roles: selectedRoles});
                                 }}
                                 placeholder="Select roles..."
                             />

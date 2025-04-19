@@ -68,10 +68,7 @@ export default function UserInfoPage() {
             </Tabs>
 
             {/* Actual form for Personal Info */}
-            <div
-                className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start"
-                style={{gridTemplateColumns: '75% 25%'}}
-            >
+            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] items-start">
                 <UserForm
                     user={selectedUser}
                     roles={availableRoles}
