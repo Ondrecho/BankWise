@@ -38,14 +38,23 @@ export default function RegisterForm() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <h1 className="text-3xl font-bold mb-4">Sign Up</h1>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
-                <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <Input type="text" placeholder="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                <Input type="date" placeholder="Date of Birth" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
-                <Button type="submit" disabled={isPending}>
+        <div className="flex flex-col items-center justify-center min-h-screen py-8">
+            <h1 className="text-4xl font-bold mb-8">Sign Up</h1>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-lg px-8">
+                <Input type="email" placeholder="Email"
+                       value={email} onChange={(e) => setEmail(e.target.value)}
+                       className="py-4 px-3 text-lg"
+                />
+                <Input type="password" placeholder="Password"
+                       value={password} onChange={(e) => setPassword(e.target.value)}
+                       className="py-4 px-3 text-lg"/>
+                <Input type="text" placeholder="Full Name"
+                       value={fullName} onChange={(e) => setFullName(e.target.value)}
+                       className="py-4 px-3 text-lg"/>
+                <Input type="date" placeholder="Date of Birth"
+                       value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)}
+                />
+                <Button type="submit" disabled={isPending}  className="py-4 px-3 text-lg ">
                     {isPending ? 'Registering...' : 'Register'}
                 </Button>
             </form>
