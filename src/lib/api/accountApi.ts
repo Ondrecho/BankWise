@@ -6,6 +6,9 @@ const API_URL = 'http://localhost:8080/api';
 
 export async function getUserAccounts(userId: number): Promise<Account[]> {
     const res = await fetchWithAuth(`${API_URL}/admin/users/${userId}/accounts`);
+    if (res.status === 404) {
+        return [];
+    }
     if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message || 'Failed to fetch accounts');

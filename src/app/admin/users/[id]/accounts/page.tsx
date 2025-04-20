@@ -90,11 +90,15 @@ export default function UserAccountsPage() {
                 </TabsList>
             </Tabs>
 
-            <UserAccounts
-                accounts={accounts}
-                isLoading={isAccountsLoading}
-                onAccountAction={handleAccountAction}
-            />
+            {isAccountsLoading ? (
+                <div className="p-4">Loading accounts...</div>
+            ) : (
+                <UserAccounts
+                    accounts={accounts}
+                    isLoading={false}
+                    onAccountAction={handleAccountAction}
+                />
+            )}
 
             <ConfirmDialog
                 open={!!ibanToDelete}
