@@ -1,6 +1,6 @@
 'use client';
 
-import {Account, User} from '@/types';
+import {Account} from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import React from 'react';
@@ -43,13 +43,19 @@ export function UserAccounts({
                             <div className="flex gap-2">
                                 <Button
                                     variant="outline"
-                                    onClick={() => onAccountAction('toggle-status', account.iban)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onAccountAction('toggle-status', account.iban);
+                                    }}
                                 >
                                     {account.status === 'ACTIVE' ? 'Close' : 'Open'}
                                 </Button>
                                 <Button
                                     variant="destructive"
-                                    onClick={() => onAccountAction('delete', account.iban)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onAccountAction('delete', account.iban)
+                                    }}
                                 >
                                     Delete
                                 </Button>
