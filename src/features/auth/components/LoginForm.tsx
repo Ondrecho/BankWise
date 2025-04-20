@@ -52,7 +52,7 @@ export default function LoginForm() {
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-lg px-8">
-                    <Input type="email"
+                    <Input type="emaile"
                            placeholder="Email"
                            value={email}
                            onChange={(e) => setEmail(e.target.value)}

@@ -58,34 +58,40 @@ export default function AccountActionPanel({
         <Dialog open onOpenChange={onClose}>
             <DialogContent className="max-w-lg space-y-6">
                 <DialogHeader>
-                    <DialogTitle>{account.iban}</DialogTitle>
-                    <DialogTitle className="text-xl">
+                    <DialogTitle>
+                        {account.iban}
+                    </DialogTitle>
+                    <DialogTitle className="text-xl font-semibold text-muted-foreground">
                         {account.balance} {account.currency} • {account.status}
                     </DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-4">
-                    <Label>Operation</Label>
-                    <Select onValueChange={setOperation} value={operation ?? ''}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Choose operation type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="deposit">Deposit</SelectItem>
-                            <SelectItem value="withdraw">Withdrawal</SelectItem>
-                            <SelectItem value="transfer">Transfer</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <div className="space-y-2">
+                        <Label>Operation</Label>
+                        <Select onValueChange={setOperation} value={operation ?? ''}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Choose operation type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="deposit">Deposit</SelectItem>
+                                <SelectItem value="withdraw">Withdrawal</SelectItem>
+                                <SelectItem value="transfer">Transfer</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                    {operation === 'transfer' && (
-                        <div className="space-y-2">
-                            <Label>recipient IBAN</Label>
-                            <Input value={toIban} onChange={(e) => setToIban(e.target.value)} placeholder="IBAN" />
+                    <div className="relative !min-h-[180px] transition-all duration-200 space-y-4">
+                        <div className={operation === 'transfer' ? 'space-y-2' : 'hidden'}>
+                            <Label>Recipient IBAN</Label>
+                            <Input
+                                value={toIban}
+                                onChange={(e) => setToIban(e.target.value)}
+                                placeholder="IBAN"
+                            />
                         </div>
-                    )}
 
-                    {operation && (
-                        <div className="space-y-2">
+                        <div className={operation ? 'space-y-2' : 'opacity-0 pointer-events-none'}>
                             <Label>Amount</Label>
                             <Input
                                 type="number"
@@ -93,13 +99,16 @@ export default function AccountActionPanel({
                                 onChange={(e) => setAmount(e.target.value)}
                                 placeholder="Enter amount"
                             />
-                            <div className="flex justify-end pt-2">
-                                <Button onClick={handleSubmit}>Confirm</Button>
-                            </div>
                         </div>
-                    )}
+                        <div className="flex justify-end pt-2">
+                            <Button onClick={handleSubmit} size="sm" disabled={!amount || parseFloat(amount) <= 0}>
+                                Confirm
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>
     );
+
 }
