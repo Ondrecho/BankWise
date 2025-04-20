@@ -14,6 +14,7 @@ import {useToggleAccountStatus} from "@/features/admin-users/hooks/useToggleAcco
 import {Account} from "@/types";
 import AccountActionPanel from "@/features/admin-users/components/AccountActionPanel";
 import {deposit, transfer, withdraw} from "@/lib/api/accountTransactionApi";
+import {toast} from "@/hooks/use-toast";
 
 export default function UserAccountsPage() {
     const { id } = useParams();
@@ -37,16 +38,38 @@ export default function UserAccountsPage() {
         if (action === 'delete') {
             setIbanToDelete(iban);
         } else {
-            const account = accounts.find((acc: Account) => acc.iban === iban);
+            const account = accounts.find((acc) => acc.iban === iban);
             if (!account) return;
 
             const nextStatus = account.status === 'ACTIVE' ? 'close' : 'open';
             toggleStatusMutation.mutate(
                 { iban, status: nextStatus },
-                { onSuccess: () => refetch() }
+                {
+                    onSuccess: () => refetch(),
+                    onError: async (error) => {
+                        if (error instanceof Response && error.status === 409) {
+                            const data = await error.json();
+                            if (data?.errorCode === 'BUSINESS_ERROR') {
+                                toast({
+                                    title: 'Cannot close account',
+                                    description: `${data.message} (IBAN: ${data.details?.iban})`,
+                                    variant: 'destructive',
+                                });
+                                return;
+                            }
+                        }
+
+                        toast({
+                            title: 'Failed to change status',
+                            description: 'Unexpected error occurred',
+                            variant: 'destructive',
+                        });
+                    }
+                }
             );
         }
     };
+
 
     const confirmDelete = () => {
         if (ibanToDelete) {
