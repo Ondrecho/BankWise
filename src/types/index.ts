@@ -20,6 +20,7 @@ export type Role = {
     id: number;
     name: string;
     description?: string;
+    usersCount?: number;
 }
 
 export type Account = {
