@@ -126,13 +126,22 @@ export default function UserAccountsPage() {
                     account={selectedAccount}
                     onClose={() => setSelectedAccount(null)}
                     onDeposit={(amount) => {
-                        deposit(selectedAccount.iban, selectedAccount.currency, amount).then(() => refetch);
+                        deposit(selectedAccount.iban, selectedAccount.currency, amount).then(() => {
+                            refetch();
+                            setSelectedAccount(null);
+                        });
                     }}
                     onWithdraw={(amount) => {
-                        withdraw(selectedAccount.iban, selectedAccount.currency, amount).then(() => refetch);
+                        withdraw(selectedAccount.iban, selectedAccount.currency, amount).then(() => {
+                            refetch();
+                            setSelectedAccount(null);
+                        });
                     }}
                     onTransfer={(toIban, amount) => {
-                        transfer(selectedAccount.iban, toIban, selectedAccount.currency, amount).then(() => refetch);
+                        transfer(selectedAccount.iban, toIban, selectedAccount.currency, amount).then(()  => {
+                            refetch();
+                            setSelectedAccount(null);
+                        });
                     }}
                 />
             )}

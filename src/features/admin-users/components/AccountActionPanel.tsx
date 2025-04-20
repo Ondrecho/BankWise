@@ -31,7 +31,6 @@ export default function AccountActionPanel({
     const [operation, setOperation] = useState<string | null>(null);
     const [amount, setAmount] = useState('');
     const [toIban, setToIban] = useState('');
-    const [showHistory, setShowHistory] = useState(false);
 
     const handleSubmit = () => {
         const parsedAmount = parseFloat(amount);
@@ -66,7 +65,7 @@ export default function AccountActionPanel({
                 </DialogHeader>
 
                 <div className="space-y-4">
-                    <Label>Операция</Label>
+                    <Label>Operation</Label>
                     <Select onValueChange={setOperation} value={operation ?? ''}>
                         <SelectTrigger>
                             <SelectValue placeholder="Choose operation type" />
