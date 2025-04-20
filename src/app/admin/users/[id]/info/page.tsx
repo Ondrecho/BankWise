@@ -1,35 +1,30 @@
 'use client';
 
-import { useUsers } from '@/features/admin-users/hooks/use-users';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { User as UserAvatar } from 'lucide-react';
 import { UserForm } from '@/features/admin-users/components/UserForm';
-import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {User as UserAvatar, User} from "lucide-react";
-import {useUserById} from "@/features/admin-users/hooks/useUserById";
-import {useUpdateUser} from "@/features/admin-users/hooks/useUpdateUser";
+import { useUserById } from '@/features/admin-users/hooks/useUserById';
+import { useUpdateUser } from '@/features/admin-users/hooks/useUpdateUser';
+import { useRolesQuery } from '@/features/admin-users/hooks/useRolesQuery';
+import { User } from '@/types';
 
 export default function UserInfoPage() {
-    const {
-        selectedUser,
-        setSelectedUser,
-        handleBackToList,
-        availableRoles,
-    } = useUsers();
-
-    const { id } = useParams();
     const router = useRouter();
+    const { id } = useParams();
     const { data: fetchedUser, isLoading } = useUserById(Number(id));
+    const { data: roles = [] } = useRolesQuery();
     const updateMutation = useUpdateUser();
 
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
     useEffect(() => {
-        if (fetchedUser && typeof fetchedUser === 'object') {
+        if (fetchedUser) {
             setSelectedUser(fetchedUser);
         }
     }, [fetchedUser]);
-
-    if (!selectedUser) return <div>Loading...</div>;
 
     const handleSave = async () => {
         if (selectedUser) {
@@ -37,6 +32,11 @@ export default function UserInfoPage() {
             router.push('/admin/users');
         }
     };
+
+    if (isLoading || !selectedUser) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -62,28 +62,24 @@ export default function UserInfoPage() {
                 </TabsList>
             </Tabs>
 
-            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] items-start">
+            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] items-start gap-6">
                 <UserForm
                     user={selectedUser}
-                    roles={availableRoles}
+                    roles={roles}
                     onChangeAction={setSelectedUser}
                 />
                 <div className="flex flex-col items-center justify-between h-full">
-                    <div
-                        className="w-48 h-48 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-500 mb-4">
-                        <UserAvatar className="w-full h-full"/>
+                    <div className="w-48 h-48 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-500 mb-4">
+                        <UserAvatar className="w-full h-full" />
                     </div>
                     <div className="space-x-2">
-                        <Button variant="outline" onClick={() => {
-                            handleBackToList();
-                            router.push('/admin/users');
-                        }}>Cancel</Button>
+                        <Button variant="outline" onClick={() => router.push('/admin/users')}>
+                            Cancel
+                        </Button>
                         <Button onClick={handleSave}>Save Changes</Button>
                     </div>
                 </div>
             </div>
-
         </div>
     );
 }
-

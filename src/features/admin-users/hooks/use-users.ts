@@ -15,17 +15,6 @@ export function useUsers() {
     const [isCreating, setIsCreating] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
     const [accountToDelete, setAccountToDelete] = useState<Account | null>(null);
-    const [availableRoles, setAvailableRoles] = useState<Role[]>([
-        { id: 1, name: 'individual', description: 'Частное лицо' },
-        { id: 2, name: 'business', description: 'Юридическое лицо' },
-        { id: 3, name: 'admin', description: 'Администратор' },
-        { id: 4, name: 'support', description: 'Поддержка' },
-        { id: 6, name: 'auditor', description: 'Аудитор' },
-        { id: 7, name: 'auditor2', description: 'Аудитор2' },
-        { id: 8, name: 'auditor3', description: 'Аудитор3' },
-        { id: 9, name: 'auditor4', description: 'Аудитор4' }
-    ]);
-
     // Initial mock data
     useEffect(() => {
         setUsers([{
@@ -243,8 +232,6 @@ export function useUsers() {
         isCreating,
         userToDelete,
         accountToDelete,
-        availableRoles,
-
         // Handlers
         setSelectedUser,
         setIsCreating,

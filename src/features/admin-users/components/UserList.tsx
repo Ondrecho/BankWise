@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DataTable, DataTableColumn } from '@/components/shared/DataTable';
 import {User} from "@/types";
+import { formatRoleLabel } from '@/lib/utils/formatRoleLabel';
 
 export const UserList = ({
                              users,
@@ -32,16 +33,24 @@ export const UserList = ({
         {
             header: 'Accounts',
             accessor: 'accounts',
-            render: (value) => (Array.isArray(value) ? value.length : 0),       },
+            render: (value) =>
+                <div className="w-full text-center">
+                    {Array.isArray(value) ? value.length : 0}
+                </div>,
+        },
         {
             header: 'Roles',
             accessor: 'roles',
             render: (value) =>
                 Array.isArray(value) ? (
-                    <div className="inline-flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 max-w-[200px] truncate">
                         {value.map((role) => (
-                            <Badge key={role.id} variant="secondary" className="px-2 py-0.5 text-xs">
-                                {role.description || role.name}
+                            <Badge
+                                key={role.id}
+                                variant="secondary"
+                                className="px-2 py-0.5 text-xs whitespace-nowrap"
+                            >
+                                {formatRoleLabel(role)}
                             </Badge>
                         ))}
                     </div>
@@ -50,7 +59,7 @@ export const UserList = ({
     ];
 
     return (
-            <DataTable<User>
+        <DataTable<User>
                 data={users}
                 columns={columns}
                 onRowClick={onSelect}

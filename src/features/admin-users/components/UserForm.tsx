@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Card, CardContent } from '@/components/ui/card';
 import {Button} from "@/components/ui/button";
+import {formatRoleLabel} from "@/lib/utils/formatRoleLabel";
 
 interface UserFormProps {
     user: User;
@@ -25,7 +26,7 @@ export const UserForm = ({
                          }: UserFormProps) => {
     const roleOptions = roles.map((role) => ({
         value: role.name,
-        label: role.name.replace('ROLE_', '').replaceAll('_', ' '),
+        label: formatRoleLabel(role),
     }));
 
     return (
@@ -93,10 +94,15 @@ export const UserForm = ({
                             <Label htmlFor="roles">Roles</Label>
                             <MultiSelect
                                 options={roleOptions}
-                                selected={user.roles?.map((r) => ({
-                                    value: r.name,
-                                    label: r.name.replace('ROLE_', '').replaceAll('_', ' '),
-                                })) || []}
+                                selected={
+                                    user.roles?.map((userRole) => {
+                                        const roleMatch = roles.find((r) => r.name === userRole.name);
+                                        return {
+                                            value: roleMatch?.name ?? userRole.name,
+                                            label: formatRoleLabel(roleMatch ?? userRole),
+                                        };
+                                    }) || []
+                                }
                                 onChangeAction={(selected) => {
                                     const selectedRoles = roles.filter((role) =>
                                         selected.some((s) => s.value === role.name)

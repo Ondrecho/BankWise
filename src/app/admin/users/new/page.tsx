@@ -1,6 +1,5 @@
 'use client';
 
-import { useUsers } from '@/features/admin-users/hooks/use-users';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserForm } from '@/features/admin-users/components/UserForm';

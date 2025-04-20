@@ -11,8 +11,6 @@ import {ChevronLeftIcon, ChevronRightIcon} from "lucide-react";
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import {User} from "@/types";
 
-
-
 export default function UsersPage() {
     const [page, setPage] = useState(0);
     const size = 10;
@@ -74,12 +72,10 @@ export default function UsersPage() {
                     <ChevronLeftIcon className="w-4 h-4 text-gray-600" />
                 </button>
 
-                {/* Текст с номером страницы */}
                 <span className="text-sm text-gray-600">
     Page {data.number + 1} of {data.totalPages}
   </span>
 
-                {/* Правая стрелка */}
                 <button
                     className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
                     disabled={data.last}
