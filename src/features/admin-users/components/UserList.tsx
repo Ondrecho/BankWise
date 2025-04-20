@@ -7,6 +7,7 @@ import { DataTable, DataTableColumn } from '@/components/shared/DataTable';
 import {User} from "@/types";
 import { formatRoleLabel } from '@/lib/utils/formatRoleLabel';
 import {useState} from "react";
+import {cn} from "@/lib/utils/uiUtils";
 
 export const UserList = ({
                              users,
@@ -19,49 +20,54 @@ export const UserList = ({
     onDelete: (user: User) => void;
     currentEmail?: string | null;
 }) => {
+    const [expandedUserIds, setExpandedUserIds] = useState<number[]>([]);
+
     const columns: DataTableColumn<User>[] = [
         {
             header: 'Status',
             accessor: 'active',
-            render: (value, row) => (
+            render: (value) => (
                 <Badge variant={value ? 'default' : 'destructive'}>
                     {value ? 'active' : 'blocked'}
                 </Badge>
             ),
         },
         { header: 'Full Name', accessor: 'fullName' },
-        { header: 'Email', accessor: 'email', },
+        {
+            header: 'Email',
+            accessor: 'email',
+            render: (value) => (
+                <div className="whitespace-normal break-words text-sm">{value}</div>
+            ),
+        },
         {
             header: 'Accounts',
             accessor: 'accounts',
             render: (value) => (
-                <div className="text-center w-full">
-                    {Array.isArray(value) ? value.length : 0}
-                </div>
+                <div className="text-center">{Array.isArray(value) ? value.length : 0}</div>
             ),
         },
         {
             header: 'Roles',
             accessor: 'roles',
-            render: (value, row) => {
-                const [expanded, setExpanded] = useState(false);
+            render: (value, row, { isExpanded, toggleExpand }) => {
                 const roles = Array.isArray(value) ? value : [];
-
                 return (
                     <div
                         onClick={(e) => {
                             e.stopPropagation();
-                            setExpanded(!expanded);
+                            toggleExpand();
                         }}
-                        className={`flex flex-wrap gap-1 cursor-pointer overflow-hidden transition-all ${
-                            expanded ? 'max-h-none' : 'max-h-[3.5rem]'
-                        }`}
+                        className={cn(
+                            "flex flex-wrap gap-1 cursor-pointer transition-all",
+                            isExpanded ? "max-h-full" : "max-h-[3.5rem] overflow-hidden"
+                        )}
                     >
                         {roles.map((role) => (
                             <Badge
                                 key={role.id}
                                 variant="secondary"
-                                className="px-2 py-0.5 text-xs whitespace-nowrap"
+                                className="px-2 py-0.5 text-xs whitespace-nowrap max-w-full"
                             >
                                 {formatRoleLabel(role)}
                             </Badge>
@@ -69,27 +75,27 @@ export const UserList = ({
                     </div>
                 );
             },
-        }
+        },
     ];
 
     return (
         <DataTable<User>
-                data={users}
-                columns={columns}
-                onRowClick={onSelect}
-                actions={(user) => (
-                    <Button
-                        variant="destructive"
-                        size="sm"
-                        disabled={user.email === currentEmail}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(user);
-                        }}
-                    >
-                        Delete
-                    </Button>
-                )}
-            />
+            data={users}
+            columns={columns}
+            onRowClick={onSelect}
+            actions={(user) => (
+                <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={user.email === currentEmail}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(user);
+                    }}
+                >
+                    Delete
+                </Button>
+            )}
+        />
     );
 };
