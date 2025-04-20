@@ -1,50 +1,72 @@
 'use client';
 
-import { useUsers } from '@/features/admin-users/hooks/use-users';
 import {useParams, useRouter} from 'next/navigation';
-import {useEffect, useState} from 'react';
+import { useState} from 'react';
 import { UserAccounts } from '@/features/admin-users/components/UserAccounts';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import {Button} from "@/components/ui/button";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import CreateAccountModal from "@/features/admin-users/components/CreateAccountModal";
+import { useUserAccounts } from '@/features/admin-users/hooks/useUserAccounts';
+import {useUserById} from "@/features/admin-users/hooks/useUserById";
+import {useDeleteAccount} from "@/features/admin-users/hooks/useDeleteAccount";
+import {useToggleAccountStatus} from "@/features/admin-users/hooks/useToggleAccountStatus";
+import {Account} from "@/types";
 
 export default function UserAccountsPage() {
-    const {
-        users,
-        selectedUser,
-        setSelectedUser,
-        handleCreateAccount,
-        handleAccountAction,
-        confirmAccountDelete,
-        handleBackToList,
-        accountToDelete,
-        setAccountToDelete,
-    } = useUsers();
-
     const { id } = useParams();
+    const userId = Number(id);
     const router = useRouter();
+
+    const { data: user, isLoading: isUserLoading } = useUserById(userId);
+    const { accounts, isLoading: isAccountsLoading, createAccount, refetch } = useUserAccounts(userId);
+
+    const deleteAccountMutation = useDeleteAccount();
+    const toggleStatusMutation = useToggleAccountStatus();
+
     const [showModal, setShowModal] = useState(false);
+    const [ibanToDelete, setIbanToDelete] = useState<string | null>(null);
 
-    useEffect(() => {
-        const user = users.find(u => u.id === Number(id));
-        if (user) {
-            setSelectedUser(user);
+    const handleAccountAction = (
+        action: 'toggle-status' | 'delete',
+        iban: string
+    ) => {
+        if (action === 'delete') {
+            setIbanToDelete(iban);
+        } else {
+            const account = accounts.find((acc: Account) => acc.iban === iban);
+            if (!account) return;
+
+            const nextStatus = account.status === 'ACTIVE' ? 'close' : 'open';
+            toggleStatusMutation.mutate(
+                { iban, status: nextStatus },
+                { onSuccess: () => refetch() }
+            );
         }
-    }, [id, users]);
+    };
 
-    if (!selectedUser) return <div className="p-6">Loading...</div>;
+    const confirmDelete = () => {
+        if (ibanToDelete) {
+            deleteAccountMutation.mutate(
+                { userId, iban: ibanToDelete },
+                {
+                    onSuccess: () => {
+                        setIbanToDelete(null);
+                        refetch();
+                    },
+                }
+            );
+        }
+    };
+
+    if (isUserLoading || !user) return <div className="p-6">Loading user...</div>;
 
     return (
         <div className="space-y-6">
-            {/* Top panel: title + actions */}
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold">{selectedUser.fullName} accounts</h2>
+                <h2 className="text-2xl font-semibold">{user.fullName} accounts</h2>
                 <div className="space-x-2">
-                    <Button variant="outline" onClick={() => {
-                        handleBackToList();
-                        router.push('/admin/users');
-                    }}>Back</Button>
+                    <Button variant="outline" onClick={() => router.push('/admin/users')}>Back</Button>
                     <Button onClick={() => setShowModal(true)}>Create Account</Button>
                 </div>
             </div>
@@ -53,15 +75,15 @@ export default function UserAccountsPage() {
                 <TabsList className="mb-4 flex gap-2 border-b border-gray-300 justify-start items-stretch h-12">
                     <TabsTrigger
                         value="info"
-                        className="h-full m-0 flex items-center px-4 py-0 leading-none font-semibold text-gray-700 rounded-md transition-colors duration-200 hover:bg-gray-50 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
-                        onClick={() => router.push(`/admin/users/${id}/info`)}
+                        className="h-full px-4 py-0 font-semibold text-gray-700 rounded-md transition-colors hover:bg-gray-50 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
+                        onClick={() => router.push(`/admin/users/${userId}/info`)}
                     >
                         Personal Info
                     </TabsTrigger>
                     <TabsTrigger
                         value="accounts"
-                        className="h-full m-0 flex items-center px-4 py-0 leading-none font-semibold text-gray-700 rounded-md transition-colors duration-200 hover:bg-gray-50 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
-                        onClick={() => router.push(`/admin/users/${id}/accounts`)}
+                        className="h-full px-4 py-0 font-semibold text-gray-700 rounded-md transition-colors hover:bg-gray-50 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
+                        onClick={() => router.push(`/admin/users/${userId}/accounts`)}
                     >
                         Bank Accounts
                     </TabsTrigger>
@@ -69,25 +91,26 @@ export default function UserAccountsPage() {
             </Tabs>
 
             <UserAccounts
-                user={selectedUser}
-                onCreateAccountAction={handleCreateAccount}
+                accounts={accounts}
+                isLoading={isAccountsLoading}
                 onAccountAction={handleAccountAction}
             />
 
             <ConfirmDialog
-                open={!!accountToDelete}
+                open={!!ibanToDelete}
                 title="Delete Account"
-                description={`Delete account ${accountToDelete?.iban}?`}
-                onConfirm={confirmAccountDelete}
-                onCancel={() => setAccountToDelete(null)}
+                description={`Delete account ${ibanToDelete}?`}
+                onConfirm={confirmDelete}
+                onCancel={() => setIbanToDelete(null)}
             />
 
             <CreateAccountModal
                 open={showModal}
                 onOpenChangeAction={setShowModal}
                 onCreateAction={(currency) => {
-                    handleCreateAccount(currency);
+                    createAccount(currency);
                     setShowModal(false);
+                    refetch();
                 }}
             />
         </div>

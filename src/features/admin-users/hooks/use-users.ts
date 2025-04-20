@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { User, Account, Role } from '@/types';
-//import { getUsers, createUser, updateUser, deleteUser } from '@/services/users-service';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
@@ -247,35 +246,5 @@ export function useUsers() {
         setAccountToDelete,
         setUserToDelete,
         handleLogout,
-
-/*        // API methods (for future use)
-        fetchUsers,
-        addUser: async (user: Omit<User, 'id'> & { password: string }) => {
-            try {
-                const newUser = await createUser(user);
-                setUsers(prev => [...prev, newUser]);
-                return true;
-            } catch (err) {
-                return false;
-            }
-        },
-        updateUser: async (id: number, user: Partial<User>) => {
-            try {
-                const updatedUser = await updateUser(id, user);
-                setUsers(prev => prev.map(u => u.id === id ? updatedUser : u));
-                return true;
-            } catch (err) {
-                return false;
-            }
-        },
-        deleteUser: async (id: number) => {
-            try {
-                await deleteUser(id);
-                setUsers(prev => prev.filter(u => u.id !== id));
-                return true;
-            } catch (err) {
-                return false;
-            }
-        }*/
     };
 }
