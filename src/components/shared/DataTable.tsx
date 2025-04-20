@@ -18,16 +18,22 @@ interface DataTableProps<T> {
 
 export function DataTable<T>({ data, columns, onRowClick, actions }: DataTableProps<T>) {
     return (
+        <div className="border rounded-md overflow-hidden">
+            <Table className="min-w-full table-fixed">
+                <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+                    <TableRow>
+                        {columns.map((column) => (
+                            <TableHead key={String(column.accessor)} className={column.header === 'Accounts' || column.header === 'Actions' ? 'text-center' : ''}>
+                                {column.header}
+                            </TableHead>
+                        ))}
+                        {actions && <TableHead className="text-center pr-12">Actions</TableHead>}
+                    </TableRow>
+                </TableHeader>
+            </Table>
+
             <div className="max-h-[500px] overflow-y-auto">
                 <Table className="min-w-full table-fixed">
-                    <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
-                        <TableRow>
-                            {columns.map((column) => (
-                                <TableHead key={String(column.accessor)}>{column.header}</TableHead>
-                            ))}
-                            {actions && <TableHead className="text-right">Actions</TableHead>}
-                        </TableRow>
-                    </TableHeader>
                     <TableBody>
                         {data.map((item, index) => (
                             <TableRow
@@ -37,17 +43,21 @@ export function DataTable<T>({ data, columns, onRowClick, actions }: DataTablePr
                             >
                                 {columns.map((column) => {
                                     const value = item[column.accessor];
+                                    const cellClass = column.header === 'Accounts' || column.header === 'Actions' ? 'text-center' : '';
                                     return (
-                                        <TableCell key={String(column.accessor)}>
+                                        <TableCell key={String(column.accessor)} className={cellClass}>
                                             {column.render ? column.render(value, item) : String(value)}
                                         </TableCell>
                                     );
                                 })}
-                                {actions && <TableCell className="text-right">{actions(item)}</TableCell>}
+                                {actions && (
+                                    <TableCell className="text-center">{actions(item)}</TableCell>
+                                )}
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </div>
+        </div>
     );
 }

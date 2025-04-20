@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable, DataTableColumn } from '@/components/shared/DataTable';
 import {User} from "@/types";
 import { formatRoleLabel } from '@/lib/utils/formatRoleLabel';
+import {useState} from "react";
 
 export const UserList = ({
                              users,
@@ -29,22 +30,34 @@ export const UserList = ({
             ),
         },
         { header: 'Full Name', accessor: 'fullName' },
-        { header: 'Email', accessor: 'email' },
+        { header: 'Email', accessor: 'email', },
         {
             header: 'Accounts',
             accessor: 'accounts',
-            render: (value) =>
-                <div className="w-full text-center">
+            render: (value) => (
+                <div className="text-center w-full">
                     {Array.isArray(value) ? value.length : 0}
-                </div>,
+                </div>
+            ),
         },
         {
             header: 'Roles',
             accessor: 'roles',
-            render: (value) =>
-                Array.isArray(value) ? (
-                    <div className="flex flex-wrap gap-1 max-w-[200px] truncate">
-                        {value.map((role) => (
+            render: (value, row) => {
+                const [expanded, setExpanded] = useState(false);
+                const roles = Array.isArray(value) ? value : [];
+
+                return (
+                    <div
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setExpanded(!expanded);
+                        }}
+                        className={`flex flex-wrap gap-1 cursor-pointer overflow-hidden transition-all ${
+                            expanded ? 'max-h-none' : 'max-h-[3.5rem]'
+                        }`}
+                    >
+                        {roles.map((role) => (
                             <Badge
                                 key={role.id}
                                 variant="secondary"
@@ -54,8 +67,9 @@ export const UserList = ({
                             </Badge>
                         ))}
                     </div>
-                ) : null,
-        },
+                );
+            },
+        }
     ];
 
     return (
