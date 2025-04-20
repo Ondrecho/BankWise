@@ -21,6 +21,10 @@ export const UserList = ({
     currentEmail?: string | null;
 }) => {
     const [expandedUserIds, setExpandedUserIds] = useState<number[]>([]);
+    const toggleExpand = (id: number) =>
+        setExpandedUserIds(prev =>
+            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        );
 
     const columns: DataTableColumn<User>[] = [
         {
@@ -50,28 +54,47 @@ export const UserList = ({
         {
             header: 'Roles',
             accessor: 'roles',
-            render: (value, row, { isExpanded, toggleExpand }) => {
+            render: (value, row) => {
                 const roles = Array.isArray(value) ? value : [];
+                const isExpanded = expandedUserIds.includes(row.id);
+                const VISIBLE_COUNT = 2;
+
+                const toShow = isExpanded ? roles : roles.slice(0, VISIBLE_COUNT);
+
                 return (
                     <div
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            toggleExpand();
-                        }}
-                        className={cn(
-                            "flex flex-wrap gap-1 cursor-pointer transition-all",
-                            isExpanded ? "max-h-full" : "max-h-[3.5rem] overflow-hidden"
-                        )}
+                        onClick={e => e.stopPropagation()}
+                        className="flex flex-wrap gap-1"
                     >
-                        {roles.map((role) => (
+                        {toShow.map(role => (
                             <Badge
                                 key={role.id}
                                 variant="secondary"
-                                className="px-2 py-0.5 text-xs whitespace-nowrap max-w-full"
+                                className="px-2 py-0.5 text-xs whitespace-nowrap"
                             >
                                 {formatRoleLabel(role)}
                             </Badge>
                         ))}
+
+                        {!isExpanded && roles.length > VISIBLE_COUNT && (
+                            <Badge
+                                variant="outline"
+                                className="px-2 py-0.5 text-xs cursor-pointer"
+                                onClick={() => toggleExpand(row.id)}
+                            >
+                                +{roles.length - VISIBLE_COUNT}
+                            </Badge>
+                        )}
+
+                        {isExpanded && roles.length > VISIBLE_COUNT && (
+                            <Badge
+                                variant="outline"
+                                className="px-2 py-0.5 text-xs cursor-pointer"
+                                onClick={() => toggleExpand(row.id)}
+                            >
+                                Hide
+                            </Badge>
+                        )}
                     </div>
                 );
             },
