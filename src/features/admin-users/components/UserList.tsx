@@ -7,7 +7,6 @@ import { DataTable, DataTableColumn } from '@/components/shared/DataTable';
 import {User} from "@/types";
 import { formatRoleLabel } from '@/lib/utils/formatRoleLabel';
 import {useState} from "react";
-import {cn} from "@/lib/utils/uiUtils";
 
 export const UserList = ({
                              users,
@@ -48,7 +47,7 @@ export const UserList = ({
             header: 'Accounts',
             accessor: 'accounts',
             render: (value) => (
-                <div className="text-center">{Array.isArray(value) ? value.length : 0}</div>
+                <div className="text-left pl-8">{Array.isArray(value) ? value.length : 0}</div>
             ),
         },
         {

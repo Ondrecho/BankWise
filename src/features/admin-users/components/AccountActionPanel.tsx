@@ -67,11 +67,11 @@ export default function AccountActionPanel({
                 </DialogHeader>
 
                 <div className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 py-0">
                         <Label>Operation</Label>
                         <Select onValueChange={setOperation} value={operation ?? ''}>
                             <SelectTrigger>
-                                <SelectValue placeholder="Choose operation type" />
+                                <SelectValue placeholder="Choose operation type"/>
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="deposit">Deposit</SelectItem>
@@ -80,16 +80,6 @@ export default function AccountActionPanel({
                             </SelectContent>
                         </Select>
                     </div>
-
-                    <div className="relative !min-h-[180px] transition-all duration-200 space-y-4">
-                        <div className={operation === 'transfer' ? 'space-y-2' : 'hidden'}>
-                            <Label>Recipient IBAN</Label>
-                            <Input
-                                value={toIban}
-                                onChange={(e) => setToIban(e.target.value)}
-                                placeholder="IBAN"
-                            />
-                        </div>
 
                         <div className={operation ? 'space-y-2' : 'opacity-0 pointer-events-none'}>
                             <Label>Amount</Label>
@@ -100,11 +90,21 @@ export default function AccountActionPanel({
                                 placeholder="Enter amount"
                             />
                         </div>
-                        <div className="flex justify-end pt-2">
-                            <Button onClick={handleSubmit} size="sm" disabled={!amount || parseFloat(amount) <= 0}>
-                                Confirm
-                            </Button>
+
+                    <div className="relative transition-all duration-200 space-y-4">
+                        <div className={operation === 'transfer' ? 'space-y-2' : 'opacity-0 pointer-events-none'}>
+                            <Label>Recipient IBAN</Label>
+                            <Input
+                                value={toIban}
+                                onChange={(e) => setToIban(e.target.value)}
+                                placeholder="IBAN"
+                            />
                         </div>
+                    </div>
+                    <div className="flex justify-end pt-2">
+                        <Button onClick={handleSubmit} size="sm" disabled={!amount || parseFloat(amount) <= 0}>
+                            Confirm
+                        </Button>
                     </div>
                 </div>
             </DialogContent>
