@@ -10,12 +10,14 @@ interface UserAccountsProps {
     accounts: Account[];
     isLoading: boolean;
     onAccountAction: (action: 'toggle-status' | 'delete', iban: string) => void;
+    onSelectAccount?: (account: Account) => void;
 }
 
 export function UserAccounts({
                                  accounts,
                                  isLoading,
                                  onAccountAction,
+                                 onSelectAccount
                              }: UserAccountsProps) {
     if (isLoading) return <div className="p-4">Loading accounts...</div>;
 
@@ -24,7 +26,9 @@ export function UserAccounts({
     return (
         <div className="space-y-4 max-h-[500px] overflow-y-auto">
             {accounts.map((account) => (
-                <Card key={account.id} className="border p-0">
+                <Card key={account.id}
+                      onClick={() => onSelectAccount?.(account)}
+                      className="cursor-pointer border p-0">
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>

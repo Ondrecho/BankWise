@@ -12,6 +12,8 @@ import {useUserById} from "@/features/admin-users/hooks/useUserById";
 import {useDeleteAccount} from "@/features/admin-users/hooks/useDeleteAccount";
 import {useToggleAccountStatus} from "@/features/admin-users/hooks/useToggleAccountStatus";
 import {Account} from "@/types";
+import AccountActionPanel from "@/features/admin-users/components/AccountActionPanel";
+import {deposit, transfer, withdraw} from "@/lib/api/accountTransactionApi";
 
 export default function UserAccountsPage() {
     const { id } = useParams();
@@ -26,6 +28,7 @@ export default function UserAccountsPage() {
 
     const [showModal, setShowModal] = useState(false);
     const [ibanToDelete, setIbanToDelete] = useState<string | null>(null);
+    const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
     const handleAccountAction = (
         action: 'toggle-status' | 'delete',
@@ -97,6 +100,7 @@ export default function UserAccountsPage() {
                     accounts={accounts}
                     isLoading={false}
                     onAccountAction={handleAccountAction}
+                    onSelectAccount={setSelectedAccount}
                 />
             )}
 
@@ -117,6 +121,21 @@ export default function UserAccountsPage() {
                     refetch();
                 }}
             />
+            {selectedAccount && (
+                <AccountActionPanel
+                    account={selectedAccount}
+                    onClose={() => setSelectedAccount(null)}
+                    onDeposit={(amount) => {
+                        deposit(selectedAccount.iban, selectedAccount.currency, amount).then(() => refetch);
+                    }}
+                    onWithdraw={(amount) => {
+                        withdraw(selectedAccount.iban, selectedAccount.currency, amount).then(() => refetch);
+                    }}
+                    onTransfer={(toIban, amount) => {
+                        transfer(selectedAccount.iban, toIban, selectedAccount.currency, amount).then(() => refetch);
+                    }}
+                />
+            )}
         </div>
     );
 }
