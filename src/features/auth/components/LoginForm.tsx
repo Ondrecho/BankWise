@@ -31,10 +31,16 @@ export default function LoginForm() {
                         description: 'Welcome back!',
                     });
 
+                    const targetRoute = data.isAdmin ? '/admin' : '/client';
+
                     setTimeout(() => {
-                        router.push(data.isAdmin ? '/admin' : '/client');
+                        // простая проверка: всё ещё на странице логина?
+                        if (window.location.pathname === '/auth/login') {
+                            router.push(targetRoute);
+                        }
+
                         dismiss();
-                    }, 3000);
+                    }, 2000); // 2 секунды — достаточно, и не раздражает
                 },
                 onError: (err: any) => {
                     toast({
