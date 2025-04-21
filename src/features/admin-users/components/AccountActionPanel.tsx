@@ -3,7 +3,7 @@
 import { Account } from '@/types';
 import {
     Dialog,
-    DialogContent,
+    DialogContent, DialogDescription,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
@@ -56,14 +56,14 @@ export default function AccountActionPanel({
 
     return (
         <Dialog open onOpenChange={onClose}>
-            <DialogContent className="max-w-lg space-y-6">
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
                         {account.iban}
                     </DialogTitle>
-                    <DialogTitle className="text-xl font-semibold text-muted-foreground">
+                    <DialogDescription className="text-xl font-semibold text-muted-foreground">
                         {account.balance} {account.currency} • {account.status}
-                    </DialogTitle>
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4">

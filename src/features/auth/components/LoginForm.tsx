@@ -25,17 +25,22 @@ export default function LoginForm() {
             {
                 onSuccess: (data) => {
                     login(data.token, data.isAdmin, email);
-                    toast({
+
+                    const { dismiss } = toast({
                         title: 'Login successful',
-                        description: 'Redirecting...',
+                        description: 'Welcome back!',
                     });
-                    router.push(data.isAdmin ? '/admin' : '/client');
+
+                    setTimeout(() => {
+                        router.push(data.isAdmin ? '/admin' : '/client');
+                        dismiss();
+                    }, 3000);
                 },
                 onError: (err: any) => {
                     toast({
                         variant: 'destructive',
                         title: 'Login failed',
-                        description: err.message || 'Invalid credentials.',
+                        description: err?.message || 'Invalid credentials.',
                     });
                 },
             }
@@ -47,12 +52,12 @@ export default function LoginForm() {
             <h1 className="text-4xl font-bold mb-8">Login</h1>
             {loginMutation.isPending ? (
                 <div className="flex items-center space-x-2">
-                    <Loader2 className="animate-spin" />
+                    <Loader2 className="animate-spin"/>
                     <span>Logging in...</span>
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-lg px-8">
-                    <Input type="emaile"
+                    <Input type="email"
                            placeholder="Email"
                            value={email}
                            onChange={(e) => setEmail(e.target.value)}
@@ -61,13 +66,26 @@ export default function LoginForm() {
                            placeholder="Password"
                            value={password}
                            onChange={(e) => setPassword(e.target.value)}
-                           className="py-4 px-3 text-lg" />
+                           className="py-4 px-3 text-lg"/>
                     <Button type="submit" className="py-4 text-lg">Log In</Button>
                 </form>
             )}
-            <Button variant="link" onClick={() => router.push('/auth/register')}>
-                Sign Up
-            </Button>
+            {!loginMutation.isPending && (
+                <Button variant="link" onClick={() => router.push('/auth/register')}>
+                    Sign Up
+                </Button>
+            )}
+
+            <p className="mt-4 text-sm text-center text-muted-foreground">
+                Forgot your password?{" "}
+                <button
+                    className="text-blue-600 hover:underline"
+                    onClick={() => router.push('/auth/reset-password')}
+                >
+                    Reset it here
+                </button>
+            </p>
+
         </div>
     );
 }

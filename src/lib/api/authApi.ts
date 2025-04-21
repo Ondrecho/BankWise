@@ -15,7 +15,7 @@ export async function login(email: string, password: string) {
         throw new Error(data?.error || 'Login failed');
     }
 
-    return data; // { token, isAdmin }
+    return data;
 }
 
 export async function registerUser(input: {

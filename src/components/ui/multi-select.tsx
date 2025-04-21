@@ -22,7 +22,7 @@ export interface MultiSelectOption {
     label: string;
 }
 
-const MAX_VISIBLE_BADGES = 2;
+const MAX_VISIBLE_BADGES = 4;
 
 interface MultiSelectProps {
     options: MultiSelectOption[];
