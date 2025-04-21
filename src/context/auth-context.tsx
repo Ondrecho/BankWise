@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setCurrentEmail(savedEmail);
         }
         setInitialized(true);
-    });
+    }, []);
 
     const login = (token: string, isAdmin: boolean, email: string) => {
         localStorage.setItem('token', token);
