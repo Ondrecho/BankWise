@@ -1,0 +1,21 @@
+.git
+.idea
+.env.local
+.gitignore
+.next
+node_modules
+.mofified
+
+# docs
+README.md
+components.json
+
+# TypeScript and build
+next.config.ts
+tailwind.config.ts
+tsconfig.json
+postcss.config.mjs
+next-env.d.ts
+
+# Editor/IDE
+*.iml
