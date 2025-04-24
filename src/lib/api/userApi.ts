@@ -1,5 +1,6 @@
 import { fetchWithAuth } from '@/lib/api/fetcher';
 import {User} from "@/types";
+const API_URL = 'http://localhost:8080/api';
 
 export interface PaginatedResponse<T> {
     content: T[];
@@ -11,9 +12,8 @@ export interface PaginatedResponse<T> {
     last: boolean;
 }
 
-
 export async function fetchUsers(page = 0, size = 10): Promise<PaginatedResponse<User>> {
-    const res = await fetchWithAuth(`http://localhost:8080/api/admin/users?page=${page}&size=${size}`);
+    const res = await fetchWithAuth(`${API_URL}/admin/users?page=${page}&size=${size}`);
 
     if (!res.ok) {
         throw new Error('Failed to load users');
@@ -23,13 +23,13 @@ export async function fetchUsers(page = 0, size = 10): Promise<PaginatedResponse
 }
 
 export async function fetchUserById(id: number): Promise<User> {
-    const res = await fetchWithAuth(`http://localhost:8080/api/admin/users/${id}`);
+    const res = await fetchWithAuth(`${API_URL}/admin/users/${id}`);
     if (!res.ok) throw new Error('Failed to load user');
     return res.json();
 }
 
 export async function updateUser(user: User): Promise<User> {
-    const res = await fetchWithAuth(`http://localhost:8080/api/admin/users/${user.id}`, {
+    const res = await fetchWithAuth(`${API_URL}/api/admin/users/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user),
@@ -40,7 +40,7 @@ export async function updateUser(user: User): Promise<User> {
 }
 
 export async function createUser(user: User & { password: string }) {
-    const res = await fetchWithAuth(`http://localhost:8080/api/admin/users`, {
+    const res = await fetchWithAuth(`${API_URL}/admin/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -55,7 +55,7 @@ export async function createUser(user: User & { password: string }) {
 
 
 export async function deleteUser(id: number) {
-    const res = await fetchWithAuth(`http://localhost:8080/api/users/${id}`, {
+    const res = await fetchWithAuth(`${API_URL}/admin/users/${id}`, {
         method: 'DELETE',
     });
 
