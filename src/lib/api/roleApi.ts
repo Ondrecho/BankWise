@@ -1,7 +1,7 @@
 import { fetchWithAuth } from './fetcher';
 import {Role} from "@/types";
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export async function fetchRoles(): Promise<Role[]> {
     const res = await fetchWithAuth(`${API_URL}/roles`);

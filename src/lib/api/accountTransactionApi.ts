@@ -1,6 +1,6 @@
 import {fetchWithAuth} from "@/lib/api/fetcher";
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export async function transfer(fromIban: string, toIban: string, currency: string, amount: number) {
     return fetchWithAuth(`${API_URL}/transactions`, {
