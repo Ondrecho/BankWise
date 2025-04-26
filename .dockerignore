@@ -10,12 +10,5 @@ node_modules
 README.md
 components.json
 
-# TypeScript and build
-next.config.ts
-tailwind.config.ts
-tsconfig.json
-postcss.config.mjs
-next-env.d.ts
-
 # Editor/IDE
 *.iml
