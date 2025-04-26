@@ -1,4 +1,3 @@
-// src/features/auth/hooks/useRegister.ts
 import { useMutation } from '@tanstack/react-query';
 import { registerUser } from '@/lib/api/authApi';
 

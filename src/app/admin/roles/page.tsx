@@ -7,7 +7,7 @@ import { Role } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/useToast';
 
 export default function AdminRolesPage() {
     const [roles, setRoles] = useState<Role[]>([]);

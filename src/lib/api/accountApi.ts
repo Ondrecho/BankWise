@@ -1,8 +1,7 @@
-// src/lib/api/accountApi.ts
 import { fetchWithAuth } from '@/lib/api/fetcher';
 import {Account} from "@/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;;
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export async function getUserAccounts(userId: number): Promise<Account[]> {
     const res = await fetchWithAuth(`${API_URL}/admin/users/${userId}/accounts`);

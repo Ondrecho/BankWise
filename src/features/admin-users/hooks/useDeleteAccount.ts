@@ -1,4 +1,3 @@
-// src/features/admin-users/hooks/useDeleteAccount.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteAccount } from '@/lib/api/accountApi';
 

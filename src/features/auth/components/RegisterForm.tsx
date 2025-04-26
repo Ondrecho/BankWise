@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useRegister } from '@/features/auth/hooks/useRegister';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/useToast';
 
 export default function RegisterForm() {
     const [email, setEmail] = useState('');

@@ -1,4 +1,3 @@
-// src/features/admin-users/hooks/useUserAccounts.ts
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {createAccount, getUserAccounts} from '@/lib/api/accountApi';
 import {Account} from "@/types";

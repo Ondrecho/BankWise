@@ -14,7 +14,7 @@ import {useToggleAccountStatus} from "@/features/admin-users/hooks/useToggleAcco
 import {Account} from "@/types";
 import AccountActionPanel from "@/features/admin-users/components/AccountActionPanel";
 import {deposit, transfer, withdraw} from "@/lib/api/accountTransactionApi";
-import {toast} from "@/hooks/use-toast";
+import {toast} from "@/hooks/useToast";
 
 export default function UserAccountsPage() {
     const { id } = useParams();

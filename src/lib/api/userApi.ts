@@ -29,7 +29,7 @@ export async function fetchUserById(id: number): Promise<User> {
 }
 
 export async function updateUser(user: User): Promise<User> {
-    const res = await fetchWithAuth(`${API_URL}/api/admin/users/${user.id}`, {
+    const res = await fetchWithAuth(`${API_URL}/admin/users/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user),

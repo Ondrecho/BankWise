@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/useToast';
 import { Loader2 } from 'lucide-react';
 import { useLogin } from '@/features/auth/hooks/useLogin';
-import { useAuth } from '@/context/auth-context';
+import { useAuth } from '@/context/authContext';
 
 export default function LoginForm() {
     const [email, setEmail] = useState('');
@@ -34,13 +34,12 @@ export default function LoginForm() {
                     const targetRoute = data.isAdmin ? '/admin' : '/client';
 
                     setTimeout(() => {
-                        // простая проверка: всё ещё на странице логина?
                         if (window.location.pathname === '/auth/login') {
                             router.push(targetRoute);
                         }
 
                         dismiss();
-                    }, 2000); // 2 секунды — достаточно, и не раздражает
+                    }, 2000);
                 },
                 onError: (err: any) => {
                     toast({

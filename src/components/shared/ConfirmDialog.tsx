@@ -1,4 +1,3 @@
-// src/components/shared/ConfirmDialog.tsx
 'use client';
 import {
     AlertDialog,

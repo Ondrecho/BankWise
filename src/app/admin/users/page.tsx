@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { UserList } from '@/features/admin-users/components/UserList';
 import { Button } from '@/components/ui/button';
-import {useAuth} from "@/context/auth-context";
+import {useAuth} from "@/context/authContext";
 import {ChevronLeftIcon, ChevronRightIcon} from "lucide-react";
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import {User} from "@/types";

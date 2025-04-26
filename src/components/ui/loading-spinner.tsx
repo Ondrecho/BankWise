@@ -1,7 +1,7 @@
 import React from "react";
 
 interface LoadingSpinnerProps {
-    className?: string; // Добавляем опциональное свойство className
+    className?: string;
 }
 
 export function LoadingSpinner({ className }: LoadingSpinnerProps) {

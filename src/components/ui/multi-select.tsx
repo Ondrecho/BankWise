@@ -119,7 +119,7 @@ export function MultiSelect({
                 <Command>
                     <CommandInput
                         placeholder="Search items..."
-                        onChange={(e) => setSearchTerm(e.target.value)} // Исправлено использование onChange
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                     <CommandEmpty>No items found.</CommandEmpty>
                     <CommandGroup className="max-h-60 overflow-y-auto">
