@@ -1,4 +1,6 @@
 .git
+.github
+images
 .idea
 .env.local
 .gitignore

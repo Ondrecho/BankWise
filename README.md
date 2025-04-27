@@ -4,6 +4,8 @@
 
 BankWise is an online banking management system that provides administrators with tools to manage users, roles, and bank accounts. The application features a clean, responsive interface built with Next.js and a comprehensive set of banking operations.
 
+<img src="https://github.com/Ondrecho/BankWise/blob/main/images/screenshot.jpg" alt="Interface" width="640" height="360" />
+
 ## Features
 
 ### User Management
@@ -62,6 +64,9 @@ The frontend connects to a custom backend API from the [OnlineBanking repository
    ```bash
    npm run dev
    ```
+## Deploy
+
+The BankWise application is available on Render https://bankwise-cjzp.onrender.com
 
 ## License
 
