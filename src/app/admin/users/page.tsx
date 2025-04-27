@@ -63,7 +63,6 @@ export default function UsersPage() {
             </div>
 
             <div className="flex items-center justify-center gap-4 pt-4">
-                {/* Левая стрелка */}
                 <button
                     className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-200 disabled:opacity-50"
                     disabled={page === 0}

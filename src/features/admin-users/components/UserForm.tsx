@@ -7,6 +7,7 @@ import { MultiSelect } from '@/components/ui/multi-select';
 import { Card, CardContent } from '@/components/ui/card';
 import {Button} from "@/components/ui/button";
 import {formatRoleLabel} from "@/lib/utils/formatRoleLabel";
+import {useAuth} from "@/context/authContext";
 
 interface UserFormProps {
     user: User;
@@ -28,6 +29,7 @@ export const UserForm = ({
         value: role.name,
         label: formatRoleLabel(role),
     }));
+    const { currentEmail } = useAuth();
 
     return (
         <Card className="border-none shadow-none">
@@ -84,6 +86,7 @@ export const UserForm = ({
                             <Button
                                 variant={user.active ? 'default' : 'destructive'}
                                 className="w-full"
+                                disabled={user.email === currentEmail}
                                 onClick={() => onChangeAction({ ...user, active: !user.active })}
                             >
                                 {user.active ? 'Active' : 'Blocked'}
